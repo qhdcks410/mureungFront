@@ -10,12 +10,15 @@ import VueTablerIcons from 'vue-tabler-icons';
 import axios from 'axios';
 
 import { fakeBackend } from '@/utils/helpers/fake-backend';
+import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 
 // print
 import print from 'vue3-print-nb';
 
 const app = createApp(App);
 app.config.globalProperties.axios = axios;
+// Register all Community features
+ModuleRegistry.registerModules([AllCommunityModule]);
 fakeBackend();
 app.use(router);
 app.use(PerfectScrollbarPlugin);
