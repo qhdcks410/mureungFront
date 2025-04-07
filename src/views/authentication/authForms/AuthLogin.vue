@@ -3,23 +3,17 @@ import { ref } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { Form } from 'vee-validate';
 
-// const checkbox = ref(false);
-// const valid = ref(false);
-const show1 = ref(false);
-//const logform = ref();
-const password = ref('admin123');
-const username = ref('info@codedthemes.com');
-const passwordRules = ref([
-  (v: string) => !!v || 'Password is required',
-  (v: string) => (v && v.length <= 10) || 'Password must be less than 10 characters'
-]);
-const emailRules = ref([(v: string) => !!v || 'E-mail is required', (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid']);
 
+const show1 = ref(false);
+
+const password = ref('test');
+const username = ref('test');
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function validate(values: any, { setErrors }: any) {
   const authStore = useAuthStore();
-  return authStore.login(username.value, password.value).catch((error) => setErrors({ apiError: error }));
+  authStore.login(username.value, password.value).catch((error) => setErrors({ apiError: error }));
 }
+
 </script>
 
 <template>
@@ -38,7 +32,6 @@ function validate(values: any, { setErrors }: any) {
   <Form @submit="validate" class="mt-7 loginForm" v-slot="{ errors, isSubmitting }">
     <v-text-field
       v-model="username"
-      :rules="emailRules"
       label="아이디"
       class="mt-4 mb-8"
       required
@@ -49,7 +42,6 @@ function validate(values: any, { setErrors }: any) {
     ></v-text-field>
     <v-text-field
       v-model="password"
-      :rules="passwordRules"
       label="비밀번호"
       required
       density="comfortable"
@@ -76,7 +68,7 @@ function validate(values: any, { setErrors }: any) {
         <a href="javascript:void(0)" class="text-primary text-decoration-none">Forgot password?</a>
       </div>
     </div> -->
-    <v-btn color="secondary" :loading="isSubmitting" block class="mt-2" variant="flat" size="large" :disabled="valid" type="submit">
+    <v-btn color="secondary" :loading="isSubmitting" block class="mt-2" variant="flat" size="large" type="submit">
       로그인</v-btn>
     <div v-if="errors.apiError" class="mt-2">
       <v-alert color="error">{{ errors.apiError }}</v-alert>

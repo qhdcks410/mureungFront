@@ -8,7 +8,17 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "allowJs": true
+    "allowJs": true,
+    "target": "es5",
+    "removeComments": true,
+    "sourceMap": true,
+    "alwaysStrict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "strictNullChecks": true,
+    "skipLibCheck": true,
+    "lib": ["es5", "dom", "es2015","es2016"]    
   },
 
   "references": [

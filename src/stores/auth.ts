@@ -1,8 +1,7 @@
 import { defineStore } from 'pinia';
 import { router } from '@/router';
-import { fetchWrapper } from '@/utils/helpers/fetch-wrapper';
-
-const baseUrl = `${import.meta.env.VITE_API_URL}/users`;
+import { useLoginStore } from '@/stores/login';
+import request from '@/api/request';
 
 export const useAuthStore = defineStore({
   id: 'auth',
@@ -15,18 +14,39 @@ export const useAuthStore = defineStore({
   }),
   actions: {
     async login(username: string, password: string) {
-      const user = await fetchWrapper.post(`${baseUrl}/authenticate`, { username, password });
+     const loginStore  = useLoginStore();
 
-      // update pinia state
-      this.user = user;
-      // store user details and jwt in local storage to keep user logged in between page refreshes
-      localStorage.setItem('user', JSON.stringify(user));
-      // redirect to previous url or default to home page
-      router.push(this.returnUrl || '/dashboard/default');
+      const loginDto = {
+        id: username,
+        pw: password
+      }
+      const response = await request.post('/api/member/login',loginDto);
+
+      if (response.status === 200) {
+
+          await loginStore.setAccessToken(response.data.accessToken)
+          await loginStore.setRefreshToken(response.data.refreshToken)
+
+          localStorage.setItem('accessToken', response.data.accessToken)
+          localStorage.setItem('refreshToken', response.data.refreshToken)
+          await loginStore.getUserInfo(loginDto);
+
+          router.push(this.returnUrl || '/dashboard/default');
+      }
+
+      // const user = await fetchWrapper.post(`${baseUrl}/authenticate`, { username, password });
+
+      // // update pinia state
+      // this.user = user;
+      // // store user details and jwt in local storage to keep user logged in between page refreshes
+      // localStorage.setItem('user', JSON.stringify(user));
+      // // redirect to previous url or default to home page
+      
     },
     logout() {
       this.user = null;
-      localStorage.removeItem('user');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
       router.push('/login');
     }
   }

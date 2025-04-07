@@ -28,82 +28,15 @@ export interface menu {
 }
 
 const sidebarItem: menu[] = [
-  { header: 'Dashboard' },
   {
-    title: 'Default',
+    title: '대시보드',
     icon: DashboardIcon,
     to: '/dashboard/default'
   },
-  { divider: true },
-  { header: 'Pages' },
   {
-    title: 'Authentication',
+    title: '주문정보',
     icon: KeyIcon,
-    to: '/auth',
-    children: [
-      {
-        title: 'Login',
-        icon: CircleIcon,
-        to: '/login1'
-      },
-      {
-        title: 'Register',
-        icon: CircleIcon,
-        to: '/register'
-      }
-    ]
-  },
-  {
-    title: 'Error 404',
-    icon: BugIcon,
-    to: '/error'
-  },
-  { divider: true },
-  { header: 'Utilities' },
-  {
-    title: 'Typography',
-    icon: TypographyIcon,
-    to: '/utils/typography'
-  },
-  {
-    title: 'Shadows',
-    icon: ShadowIcon,
-    to: '/utils/shadows'
-  },
-  {
-    title: 'Colors',
-    icon: PaletteIcon,
-    to: '/utils/colors'
-  },
-
-  {
-    title: 'Icons',
-    icon: WindmillIcon,
-    to: '/forms/radio',
-    children: [
-      {
-        title: 'Tabler Icons',
-        icon: CircleIcon,
-        to: '/icons/tabler'
-      },
-      {
-        title: 'Material Icons',
-        icon: CircleIcon,
-        to: '/icons/material'
-      }
-    ]
-  },
-  { divider: true },
-  {
-    title: 'Sample Page',
-    icon: BrandChromeIcon,
-    to: '/starter'
-  },
-  {
-    title: 'Documentation',
-    icon: HelpIcon,
-    to: 'https://codedthemes.gitbook.io/berry-vuetify/',
-    type: 'external'
+    to: '/customer'
   }
 ];
 
