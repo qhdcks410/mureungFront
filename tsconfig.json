@@ -18,7 +18,7 @@
     "noUnusedParameters": true,
     "strictNullChecks": true,
     "skipLibCheck": true,
-    "lib": ["es5", "dom", "es2015","es2016"]    
+    "lib": ["es5","dom", "es2015","es2016"]   , 
   },
 
   "references": [

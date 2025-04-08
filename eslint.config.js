@@ -7,6 +7,7 @@ export default [
   {
     languageOptions: {
       globals: globals.browser,
+      parser: "vue-eslint-parser",
       parserOptions: {
         parser: '@typescript-eslint/parser'
       }
