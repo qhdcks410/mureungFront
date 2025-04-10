@@ -1,6 +1,8 @@
+import { defineAsyncComponent } from 'vue';
+
 const PublicRoutes = {
   path: '/',
-  component: () => import('@/layouts/blank/BlankLayout.vue'),
+  component: defineAsyncComponent(() => import('@/layouts/blank/BlankLayout.vue')) ,
   meta: {
     requiresAuth: false
   },
@@ -8,7 +10,7 @@ const PublicRoutes = {
     {
       name: 'Authentication',
       path: '/login',
-      component: () => import('@/views/authentication/LoginPage.vue')
+      component: defineAsyncComponent(() => import('@/views/authentication/LoginPage.vue'))
     }
   ]
 };
