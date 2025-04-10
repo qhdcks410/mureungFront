@@ -1,10 +1,16 @@
 <script setup lang="ts">
 import Logo from '@/layouts/full/logo/LogoDark.vue';
 import AuthLogin from './authForms/AuthLogin.vue';
+import { useCommonStore } from '@/stores/common';
+import ProgressBar from '@/components/apps/ProgressBar.vue';
+
+const common = useCommonStore();
+
 </script>
 
 <template>
   <v-row class="h-screen" no-gutters>
+    <ProgressBar :is-show="common.isShowProgress" />
     <!---Left Part-->
     <v-col cols="12" class="d-flex align-center bg-lightprimary">
       <v-container>

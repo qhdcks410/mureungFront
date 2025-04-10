@@ -1,14 +1,6 @@
 import {
-  CircleIcon,
-  WindmillIcon,
-  TypographyIcon,
-  ShadowIcon,
-  PaletteIcon,
   KeyIcon,
-  BugIcon,
   DashboardIcon,
-  BrandChromeIcon,
-  HelpIcon
 } from 'vue-tabler-icons';
 
 export interface menu {

@@ -41,6 +41,8 @@ import Dialogs from '@/components/apps/Dialogs.vue';
       updNm: ''
     }
  )
+
+
  const headers = ref([
     { align: 'center', key: 'orderNo', sortable: 'false', title: '주문번호' },
     { align: "center", key: 'compYn',title:'픽업상태'},
@@ -55,14 +57,14 @@ import Dialogs from '@/components/apps/Dialogs.vue';
     { align: 'center', key: 'updDate', title: '수정일자' },
     { align: 'center', key: 'updNm', title: '수정자' },
     { align: 'center', title: '버튼' ,value:'comp'},
- ]);
+ ] as any[]);
 
  const getOrerList = () => {
 
     const param = {
       ...search
     }
-
+    
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     request.post('/api/customer/getCustomerList',param).then((response : AxiosResponse<any, any>) => {
       const data = response.data;
@@ -186,7 +188,7 @@ import Dialogs from '@/components/apps/Dialogs.vue';
             </td>
           </template>      
           <template v-slot:item.comp="{item}">
-            <td v-if="item.compYn == 'N'">
+            <td v-if="(item as any).compYn == 'N'">
               <v-btn @click="handleCompEvent(item)">픽업완료</v-btn>
             </td>
 

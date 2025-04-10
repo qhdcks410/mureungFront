@@ -2,10 +2,9 @@
 import { ref } from 'vue';
 import { useCustomizerStore } from '../../../stores/customizer';
 // Icon Imports
-import { BellIcon, SettingsIcon, SearchIcon, Menu2Icon } from 'vue-tabler-icons';
+import { SettingsIcon, SearchIcon, Menu2Icon } from 'vue-tabler-icons';
 
 // dropdown imports
-import NotificationDD from './NotificationDD.vue';
 import ProfileDD from './ProfileDD.vue';
 import Searchbar from './SearchBarPanel.vue';
 

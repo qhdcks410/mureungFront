@@ -28,7 +28,7 @@ export default defineConfig({
     }
   },
   build: {
-    chunkSizeWarningLimit: 1024 * 1024 // Set the limit to 1 MB
+    //chunkSizeWarningLimit: 1024 * 1024 // Set the limit to 1 MB
   },
   optimizeDeps: {
     exclude: ['vuetify'],
@@ -38,9 +38,10 @@ export default defineConfig({
     proxy: {
       '/api': {  //#1. axios라이브러리 등으로 http 요청인데 api로 시작하면,
         target: 'http://127.0.0.1:8080',  //#2. 이쪽 주소로 매핑하여 백그라운드로 보내라.
+        //target: 'http://34.145.58.123:8080',  //#2. 이쪽 주소로 매핑하여 백그라운드로 보내라.
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       }
     }
-}  
+  }
 });

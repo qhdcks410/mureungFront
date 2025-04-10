@@ -5,11 +5,10 @@ import { Form } from 'vee-validate';
 
 
 const show1 = ref(false);
-
 const password = ref('test');
 const username = ref('test');
 /* eslint-disable @typescript-eslint/no-explicit-any */
-function validate(values: any, { setErrors }: any) {
+function validate(_values: any, { setErrors }: any) {
   const authStore = useAuthStore();
   authStore.login(username.value, password.value).catch((error) => setErrors({ apiError: error }));
 }

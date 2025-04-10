@@ -31,7 +31,7 @@ interface AuthStore {
   logout(): void;
 }
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, _from, next) => {
   // redirect to login page if not logged in and trying to access a restricted page
   const publicPages = ['/'];
   const auth: AuthStore = useAuthStore();

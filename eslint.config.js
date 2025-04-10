@@ -13,6 +13,17 @@ export default [
       }
     }
   },
+  {
+    "vue/valid-v-slot": ["error", {
+      "allowModifiers": true
+    }]
+  },
+  {
+    "rules": {
+      "@typescript-eslint/no-explicit-any": "off"
+    }
+  },
+
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
   ...pluginVue.configs['flat/essential']

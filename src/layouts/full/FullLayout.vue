@@ -5,7 +5,10 @@ import VerticalHeaderVue from './vertical-header/VerticalHeader.vue';
 import Customizer from './customizer/CustomizerPanel.vue';
 import FooterPanel from './footer/FooterPanel.vue';
 import { useCustomizerStore } from '../../stores/customizer';
+import ProgressBar from '@/components/apps/ProgressBar.vue';
+import { useCommonStore } from '@/stores/common';
 const customizer = useCustomizerStore();
+const common = useCommonStore();
 </script>
 
 <template>
@@ -17,8 +20,9 @@ const customizer = useCustomizerStore();
       <Customizer />
       <VerticalSidebarVue />
       <VerticalHeaderVue />
-
       <v-main>
+        <ProgressBar :is-show="common.isShowProgress"/>
+        
         <v-container fluid class="page-wrapper">
           <div>
             <RouterView />
