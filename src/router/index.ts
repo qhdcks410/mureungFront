@@ -1,8 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import MainRoutes from './MainRoutes';
-import PublicRoutes from './PublicRoutes';
-import { useAuthStore } from '@/stores/auth';
-import { useLoginStore } from '@/stores/login';
 import { defineAsyncComponent } from 'vue';
 
 export const router =createRouter({

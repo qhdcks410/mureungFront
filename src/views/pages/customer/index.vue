@@ -5,6 +5,7 @@ import UiParentCard from '@/components/shared/UiParentCard.vue';
 import request from '@/api/request';
 import type { AxiosResponse } from 'axios';
 import Dialogs from '@/components/apps/Dialogs.vue';
+import Editor from '@/components/apps/Editor.vue';
 
  const rowData = ref();
  const isActive = ref(false);
@@ -233,8 +234,8 @@ import Dialogs from '@/components/apps/Dialogs.vue';
             label="상품명"
         ></v-text-field>  
         
-
-        <v-textarea v-model="saveItem.conn" label="상담내용" rows="20"></v-textarea>
+        <Editor />
+        <!-- <v-textarea v-model="saveItem.conn" label="상담내용" rows="20"></v-textarea> -->
       </template>
       <template v-slot:actions>
         <v-spacer></v-spacer>
