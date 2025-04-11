@@ -13,9 +13,9 @@ const props = defineProps({
   <!-- ---------------------------------------------- -->
   <!-- searchbar -->
   <!-- ---------------------------------------------- -->
-  <v-text-field persistent-placeholder placeholder="고객성명" color="primary" variant="outlined" hide-details>
+  <!-- <v-text-field persistent-placeholder placeholder="고객성명" color="primary" variant="outlined" hide-details>
     <template v-slot:prepend-inner>
-      <SearchIcon stroke-width="1.5" size="17" class="text-lightText SearchIcon" />
+      <SearchIcon stroke-width="1.5" size="17" class="text-lightText Sear  chIcon" />
     </template>
     <template v-slot:append-inner>
       <v-btn color="lightsecondary" icon rounded="sm" variant="flat" size="small" class="text-secondary SearchSetting">
@@ -33,5 +33,5 @@ const props = defineProps({
         <XIcon stroke-width="1.5" size="20" />
       </v-btn>
     </template>
-  </v-text-field>
+  </v-text-field> -->
 </template>

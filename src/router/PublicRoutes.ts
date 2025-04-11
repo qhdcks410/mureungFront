@@ -8,9 +8,9 @@ const PublicRoutes = {
   },
   children: [
     {
-      name: 'Authentication',
+      name: 'login',
       path: '/login',
-      component: defineAsyncComponent(() => import('@/views/authentication/LoginPage.vue'))
+      component: () => import('@/views/authentication/LoginPage.vue')
     }
   ]
 };

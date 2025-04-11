@@ -9,8 +9,9 @@ const common = useCommonStore();
 </script>
 
 <template>
+  <ProgressBar :is-show="common.isShowProgress" />
   <v-row class="h-screen" no-gutters>
-    <ProgressBar :is-show="common.isShowProgress" />
+    
     <!---Left Part-->
     <v-col cols="12" class="d-flex align-center bg-lightprimary">
       <v-container>

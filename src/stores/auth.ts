@@ -5,6 +5,7 @@ import request from '@/api/request';
 
 export const useAuthStore = defineStore({
   id: 'auth',
+  
   state: () => ({
     // initialize state from local storage to enable user to stay logged in
     /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
@@ -15,6 +16,8 @@ export const useAuthStore = defineStore({
   actions: {
     async login(username: string, password: string) {
      const loginStore  = useLoginStore();
+     //로그인 에서 보던 화면 그대로 넘어오기
+     const {redirect} = history.state;
 
       const loginDto = {
         id: username,
@@ -31,7 +34,7 @@ export const useAuthStore = defineStore({
           localStorage.setItem('refreshToken', response.data.refreshToken)
           await loginStore.getUserInfo(loginDto);
 
-          router.push(this.returnUrl || '/dashboard/default');
+          router.push(redirect || '/customer');
       }
 
       // const user = await fetchWrapper.post(`${baseUrl}/authenticate`, { username, password });
@@ -44,10 +47,11 @@ export const useAuthStore = defineStore({
       
     },
     logout() {
-      this.user = null;
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
+      useLoginStore().$reset()
       router.push('/login');
     }
   }
 });
+
