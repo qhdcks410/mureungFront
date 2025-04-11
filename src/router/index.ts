@@ -49,7 +49,7 @@ router.beforeEach(async (to, from, next) => {
   // 로그인 라우트 이름 확인 (예: 'login')
   const loginRouteName = 'login';
   // 로그인 후 리디렉션될 기본 라우트 이름 (예: 'DashboardHome')
-  const main = 'DashboardHome';
+  const main = 'custom';
 
   if (to.name !== loginRouteName && !isAuthenticated) {
     // 로그인이 필요한 페이지 + 로그인 안됨 => 로그인 페이지로 리디렉션

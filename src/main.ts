@@ -14,8 +14,10 @@ import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 
 // print
 import print from 'vue3-print-nb';
+import {quillEditor, Quill} from 'vue3-quill';
 
 const app = createApp(App);
+
 app.config.globalProperties.axios = axios;
 // Register all Community features
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -26,4 +28,5 @@ app.use(createPinia());
 app.use(VueTablerIcons);
 app.use(print);
 app.use(VueApexCharts);
+app.use(quillEditor);
 app.use(vuetify).mount('#app');

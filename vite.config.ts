@@ -3,7 +3,6 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import vuetify from 'vite-plugin-vuetify';
 
-
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
@@ -19,6 +18,7 @@ export default defineConfig({
     })
   ],
   resolve: {
+    extensions:['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json', '.vue'],
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
@@ -33,7 +33,8 @@ export default defineConfig({
   },
   optimizeDeps: {
     exclude: ['vuetify'],
-    entries: ['./src/**/*.vue']
+    entries: ['./src/**/*.vue'],
+    include: ["quill"]
   },
   server: {
     proxy: {
@@ -46,7 +47,4 @@ export default defineConfig({
     }
   }
 });
-function ckeditor5(arg0: { theme: string; }): import("vite").PluginOption {
-  throw new Error('Function not implemented.');
-}
 

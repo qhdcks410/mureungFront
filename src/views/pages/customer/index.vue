@@ -5,7 +5,7 @@ import UiParentCard from '@/components/shared/UiParentCard.vue';
 import request from '@/api/request';
 import type { AxiosResponse } from 'axios';
 import Dialogs from '@/components/apps/Dialogs.vue';
-import Editor from '@/components/apps/Editor.vue';
+import QuillEditor from '@/components/apps/QuillEditor.vue';
 
  const rowData = ref();
  const isActive = ref(false);
@@ -25,6 +25,8 @@ import Editor from '@/components/apps/Editor.vue';
     { lable:'네이버플레이스', value :  'B'},
     { lable:'직접', value :  'C'}
   ]
+
+  const isconn = ref('sdfdsfsdf')
 
  const saveItem = reactive({
       orderNo: '',
@@ -233,9 +235,11 @@ import Editor from '@/components/apps/Editor.vue';
             v-model="saveItem.prodNm"
             label="상품명"
         ></v-text-field>  
-        
-        <Editor />
-        <!-- <v-textarea v-model="saveItem.conn" label="상담내용" rows="20"></v-textarea> -->
+        <!-- <Editor  :v-model = "2132323"/> -->
+         <!-- <v-textarea v-model="saveItem.conn" label="상담내용" rows="20"></v-textarea> -->
+
+        <QuillEditor v-model:value="saveItem.conn" />
+
       </template>
       <template v-slot:actions>
         <v-spacer></v-spacer>
