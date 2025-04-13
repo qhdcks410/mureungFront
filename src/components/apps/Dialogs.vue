@@ -1,8 +1,13 @@
 <template>
   <div class="text-center pa-4">
     <v-dialog
-      :model-value="props.modelValue" @update:modelValue="closeDialog" max-width="800" >
-    
+      :model-value="props.modelValue" 
+      @update:modelValue="closeDialog" 
+      max-width="800" 
+      variant="outlined"
+      color="secondary"      
+      >
+
       <template v-slot:default>
         <v-card title="상담내용">
         <template v-slot:text>
@@ -10,7 +15,7 @@
         </template>
         <template v-slot:actions>
           <v-spacer></v-spacer>
-          <v-btn @click="closeDialog(false)">
+          <v-btn variant="outlined" color="secondary" @click="closeDialog(false)">
             확인
           </v-btn>
         </template>

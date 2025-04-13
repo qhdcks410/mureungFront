@@ -1,7 +1,7 @@
 import axios from "axios";
 import { router } from '@/router';
 import { useCommonStore } from "@/stores/common";
-axios.defaults.baseURL = 'http://localhost:5173'
+axios.defaults.baseURL = 'http://localhost:5137'
 
 
 // axios 인스턴스를 생성합니다.

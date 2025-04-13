@@ -27,21 +27,9 @@ export const router =createRouter({
   ]
 });
 
-interface User {
-  id: number;
-  name: string;
-}
-
-// Assuming you have a type/interface for your authentication store
-interface AuthStore {
-  user: User | null;
-  returnUrl: string | null;
-  login(username: string, password: string): Promise<void>;
-  logout(): void;
-}
 
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, _from, next) => {
 
   // isAuth가 토큰 자체인지, boolean인지 명확히 가정. 여기서는 boolean으로 가정.
   const isAuthenticated = localStorage.getItem('accessToken'); // 예시: 인증 상태 boolean 반환 메서드

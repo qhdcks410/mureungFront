@@ -18,6 +18,8 @@ import { reactive,defineProps } from 'vue'
     modelValue: Boolean, // Boolean 타입의 modelValue prop (v-model="상태" 에서 '상태'가 전달됨)
   })
 
+  const emit = defineEmits(['update:modelValue'])
+
   const state = reactive({
     content: '',
     _content: '',
@@ -54,8 +56,8 @@ import { reactive,defineProps } from 'vue'
     console.log('editor ready!', quill)
   }
   const onEditorChange = ({ quill, html, text }) => {
-    console.log('editor change!', quill, html, text)
     state._content = html
+    emit('update:modelValue',html)
   }
 </script>
 <style scoped>

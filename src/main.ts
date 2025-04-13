@@ -14,7 +14,7 @@ import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 
 // print
 import print from 'vue3-print-nb';
-import {quillEditor, Quill} from 'vue3-quill';
+import {quillEditor} from 'vue3-quill';
 
 const app = createApp(App);
 
