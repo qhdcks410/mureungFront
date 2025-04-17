@@ -11,7 +11,8 @@
       <template v-slot:default>
         <v-card title="상담내용">
         <template v-slot:text>
-          <v-textarea :model-value="props.connValue" label="" rows="20"></v-textarea>
+          <QuillEditor v-model:value="props.connValue" :read-only="true" />
+          <!-- <v-textarea :model-value="props.connValue" label="" rows="20"></v-textarea> -->
         </template>
         <template v-slot:actions>
           <v-spacer></v-spacer>
@@ -27,6 +28,7 @@
 
 <script setup>
 import { defineProps, defineEmits } from 'vue'
+import QuillEditor from './QuillEditor.vue'
 
 // v-model을 사용하기 위해 'modelValue'라는 이름의 prop을 정의합니다.
 const props = defineProps({

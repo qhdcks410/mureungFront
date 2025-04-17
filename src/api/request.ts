@@ -1,13 +1,13 @@
 import axios from "axios";
 import { router } from '@/router';
 import { useCommonStore } from "@/stores/common";
-axios.defaults.baseURL = 'http://localhost:5137'
+axios.defaults.baseURL = import.meta.env.VITE_API_URL
 
 
 // axios 인스턴스를 생성합니다.
 const request = axios.create({
   baseURL: axios.defaults.baseURL,
-  timeout: 50000, // 해당 timeout이 지나면 err가 발생합니다.
+  timeout: 5000000, // 해당 timeout이 지나면 err가 발생합니다.
 });
 
 // request 인터셉터
