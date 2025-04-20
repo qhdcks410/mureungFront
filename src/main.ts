@@ -14,8 +14,11 @@ import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 
 // print
 import print from 'vue3-print-nb';
-import {quillEditor} from 'vue3-quill';
+import {quillEditor,Quill} from 'vue3-quill';
+import { ImageResize } from 'quill-image-resize-module-ts';
 
+
+Quill.register('modules/imageResize', ImageResize);
 const app = createApp(App);
 
 app.config.globalProperties.axios = axios;

@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref, type ComputedRef, type Ref } from 'vue';
 import UiParentCard from '@/components/shared/UiParentCard.vue';
 import request from '@/api/request';
 import type { AxiosResponse } from 'axios';
@@ -14,16 +14,19 @@ import QuillEditor from '@/components/apps/QuillEditor.vue';
  const connValue = ref();
  const selectedItems = ref([]);
  const selectRowData = ref();
+ const searchImageFiles = ref([]);
  const imageFiles = ref([])
 
- const search = reactive({
-      valid: false,
-      orderNo: '',
-      ordDate: '',
-      cusNm: '',
-      cusPhone:''
-    }
- )
+
+const initSearch = {
+  valid: false,
+  orderNo: '',
+  ordDate: '',
+  cusNm: '',
+  cusPhone:''
+}
+
+const search = reactive({...initSearch})
 
  const cusChnnel = [
     { lable:'선택', value :  ''},
@@ -68,13 +71,13 @@ const inintSaveItem = {
       ordTime:''      
 }
 const saveItem = reactive({ ...inintSaveItem });
- 
 
  const headers = ref([
     { align: 'center', key: 'orderNo', sortable: 'false', title: '주문번호', minWidth:'120px'},
     { align: "center", key: 'compYn',title:'픽업상태', minWidth:'120px'},
     { align: 'center', key: 'conDate', title: '주문일자' , minWidth:'200px'},
     { align: 'center', key: 'ordDate', title: '픽업일자', minWidth:'200px'},
+    { align: 'center', key: 'ordTime', title: '픽업시간', minWidth:'200px'},
     { align: 'center', key: 'cusChnnel', title: '주문채널' , minWidth:'200px'},
     { align: 'center', key: 'payMd', title: '결제수단', minWidth:'120px'},
     { align: 'center', key: 'payNt', title: '결제여부', minWidth:'120px'},
@@ -87,6 +90,10 @@ const saveItem = reactive({ ...inintSaveItem });
     { align: 'center', key: 'updDate', title: '수정일자' , minWidth:'200px'},
     { align: 'center', key: 'updNm', title: '수정자' , minWidth:'150px'}
  ] as any[]);
+
+ const resetSeach = () => {
+  Object.assign(search,initSearch);
+ }
 
 
  const formatCurrency = (value :any) => {
@@ -146,18 +153,30 @@ const saveItem = reactive({ ...inintSaveItem });
     });
  }
 
+ const selectRefFileList = (selectRowData : any) => {
 
+    const param = {
+      refNo : selectRowData.orderNo
+    }
 
+    request.post('/api/file/selectRefFileList',param).then((response : AxiosResponse<any, any>) => {
+      const data = response.data;
+      searchImageFiles.value = [...data] as any;
+      console.log(selectRowData);
+      Object.assign(saveItem, selectRowData)
+      isModify.value = true      
+    });
+
+  }
+ 
  const showSave = () => {
   Object.assign(saveItem, inintSaveItem)
   isRegiter.value = true
  }
 
- const showModify = () => {
-  const selectRowData = rowData.value.find((item : any) => item.orderNo === selectedItems.value[0]);
-  Object.assign(saveItem, selectRowData)
-  isModify.value = true
- }
+//  const showModify = ({ item } : any) => {
+//   selectRefFileList(item);
+//  }
 
  const setUpdateConn = (html :any,images: any) => {
   saveItem.conn = html;
@@ -170,8 +189,25 @@ const saveItem = reactive({ ...inintSaveItem });
     ...saveItem
   } 
 
+  param.conn = replaceImageUrl(param.conn,"serverUrl");
+
+  // 2. FormData 객체 생성
   const formData = new FormData() as any;
+
+  // 3. FormData에 데이터 추가
+  //여러 파일 추가: FileList를 순회하며 동일한 키로 append
+  imageFiles.value.forEach((file : any) => {
+    formData.append('editorFiles', file, file.name);
+  })
+  //수정할 파일 
   formData.append('saveData',JSON.stringify(param))
+
+  // FormData 내용 확인 (디버깅용)
+  //console.log("FormData 내용:");
+  for (let [key, value] of formData.entries()) {
+    console.log(`${key}:`, value); // JSON 데이터는 문자열 형태로 출력됨
+  }
+
   request.post('/api/customer/insertCustomer',formData).then((response : AxiosResponse<any, any>) => {
       if(response.status == 200){
           alert('등록되었습니다.')
@@ -233,7 +269,7 @@ const replaceImageUrl = (htmlString : any, replacementUrl :string) => {
     tempDiv.innerHTML = htmlString;
 
     // 3. 'src' 속성이 'data:image/'로 시작하는 모든 <img> 태그를 선택합니다.
-    const images = tempDiv.querySelectorAll('img[src^="data:image"]');
+    const images = tempDiv.querySelectorAll('img');
 
     // 4. 선택된 각 이미지에 대해 반복합니다.
     images.forEach(img => {
@@ -255,17 +291,18 @@ const replaceImageUrl = (htmlString : any, replacementUrl :string) => {
   selectedItems.value = newSelection; // 상태 업데이트
 };
 
-const handleRowClickEvent = (_event :any,{item } : any) => {
-  // item 객체에는 내부적인 속성들이 포함될 수 있으므로, 원본 데이터는 item.raw 로 접근하는 것이 안전할 수 있습니다.
-  // 만약 item 자체가 원본 객체라면 item을 사용합니다. 콘솔 로그로 확인해보세요.
-  const originalItem = item.raw ? item.raw : item;
-  console.log('Clicked Row Item:', originalItem);
-  selectRowData.value = originalItem; // 클릭된 행의 원본 데이터를 저장
- }
+const handleRowClick = ( item : any) => {
+    selectRefFileList(item);
+  };
 
 //삭제
  const removeOrder = () => {
   const param = [...selectedItems.value]
+
+  if(!confirm('삭제하시겠습니까?')){
+    return;
+  }
+
   request.post('/api/customer/deleteOrader',param).then((response : AxiosResponse<any, any>) => {
       if(response.status == 200){
           alert('삭제되었습니다.')
@@ -283,7 +320,6 @@ const handleRowClickEvent = (_event :any,{item } : any) => {
   await getOrerList();
  })
 
- 
 </script>
 <template>
   <!-- <BaseBreadcrumb :title="page.title" :breadcrumbs="breadcrumbs"></BaseBreadcrumb> -->
@@ -326,12 +362,6 @@ const handleRowClickEvent = (_event :any,{item } : any) => {
             label="픽업날짜"
             type="date"
           ></v-text-field>
-         
-        <!-- <v-date-input
-          v-model="search.ordData"
-          label="Select range"
-          multiple="range"
-        ></v-date-input> -->
         </v-col>
       </v-row>
     </v-container>
@@ -343,7 +373,7 @@ const handleRowClickEvent = (_event :any,{item } : any) => {
           <!-- <v-icon left>mdi-plus</v-icon> -->
           검색
       </v-btn>      
-      <v-btn variant="tonal" color="secondary" class="ml-2" @click="getOrerList">
+      <v-btn variant="tonal" color="secondary" class="ml-2" @click="resetSeach">
           <!-- <v-icon left>mdi-plus</v-icon> -->
           초기화
       </v-btn>        
@@ -357,11 +387,7 @@ const handleRowClickEvent = (_event :any,{item } : any) => {
               <v-btn variant="outlined" class="ml-2" @click="showSave">
                 <!-- <v-icon left>mdi-plus</v-icon> -->
                 등록
-              </v-btn>
-               <v-btn variant="outlined" class="ml-2" @click="showModify">
-                <!-- <v-icon left>mdi-plus</v-icon> -->
-                수정
-              </v-btn>             
+              </v-btn>         
               <v-btn variant="outlined" class="ml-2" @click="removeOrder">
                   <!-- <v-icon left>mdi-download</v-icon> -->
                   삭제
@@ -373,10 +399,16 @@ const handleRowClickEvent = (_event :any,{item } : any) => {
           :items=rowData
           :model-value="selectedItems" @update:modelValue="handleSelectionUpdate" item-value="orderNo"
           show-select
-          select-strategy = 'single'
           hover
-          @click-row="handleRowClickEvent"
           height="500px">
+          <template v-slot:item.orderNo="{item} : any">
+            <td>
+              <v-btn variant="text" @click="handleRowClick(item)">
+                {{ item.orderNo }}            
+              </v-btn>
+             
+            </td>
+          </template>          
           <template v-slot:item.cusChnnel="{item}">
             <td>
               <v-btn variant="text">
@@ -594,7 +626,7 @@ const handleRowClickEvent = (_event :any,{item } : any) => {
         <!-- <Editor  :v-model = "2132323"/> -->
          <!-- <v-textarea v-model="saveItem.conn" label="상담내용" rows="20"></v-textarea> -->
 
-        <QuillEditor v-model:value="saveItem.conn" @update:model-value="setUpdateConn" />
+        <QuillEditor v-model:value="saveItem.conn" :img-files="searchImageFiles" @update:model-value="setUpdateConn" />
 
       </template>
       <template v-slot:actions>
