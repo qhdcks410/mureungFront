@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, type ComputedRef, type Ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import UiParentCard from '@/components/shared/UiParentCard.vue';
 import request from '@/api/request';
 import type { AxiosResponse } from 'axios';
@@ -13,7 +13,6 @@ import QuillEditor from '@/components/apps/QuillEditor.vue';
  const isModify = ref(false);
  const connValue = ref();
  const selectedItems = ref([]);
- const selectRowData = ref();
  const searchImageFiles = ref([]);
  const imageFiles = ref([])
 
@@ -196,9 +195,10 @@ const saveItem = reactive({ ...inintSaveItem });
 
   // 3. FormData에 데이터 추가
   //여러 파일 추가: FileList를 순회하며 동일한 키로 append
-  imageFiles.value.forEach((file : any) => {
-    formData.append('editorFiles', file, file.name);
-  })
+  imageFiles.value.forEach((img : any,index : number) => {
+      const file = base64toFile(img,`img${index}`);
+      formData.append('editorFiles', file, file.name);
+    })
   //수정할 파일 
   formData.append('saveData',JSON.stringify(param))
 
@@ -231,7 +231,8 @@ const saveItem = reactive({ ...inintSaveItem });
 
     // 3. FormData에 데이터 추가
     //여러 파일 추가: FileList를 순회하며 동일한 키로 append
-    imageFiles.value.forEach((file : any) => {
+    imageFiles.value.forEach((img : any,index : number) => {
+       const file = base64toFile(img,`img${index}`);
       formData.append('editorFiles', file, file.name);
     })
     //수정할 파일 
@@ -285,6 +286,21 @@ const replaceImageUrl = (htmlString : any, replacementUrl :string) => {
     // 오류 발생 시 원본 HTML을 반환하여 예기치 않은 중단을 방지합니다.
     return htmlString;
   }
+}
+
+const base64toFile = (base_data : any, filename : any) => {
+
+  var arr = base_data.split(','),
+      mime = arr[0].match(/:(.*?);/)[1],
+      bstr = atob(arr[1]),
+      n = bstr.length,
+      u8arr = new Uint8Array(n);
+
+  while(n--){
+      u8arr[n] = bstr.charCodeAt(n);
+  }
+
+  return new File([u8arr], filename, {type:mime});
 }
 
  const handleSelectionUpdate = (newSelection :any) => {

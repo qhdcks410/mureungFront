@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import Logo from '@/layouts/full/logo/LogoDark.vue';
 import AuthLogin from './authForms/AuthLogin.vue';
 import { useCommonStore } from '@/stores/common';
 import ProgressBar from '@/components/apps/ProgressBar.vue';
@@ -24,7 +23,7 @@ const common = useCommonStore();
                     <!---Left Part Logo -->
                     <v-row>
                       <v-col cols="12" class="text-center">
-                        <Logo />
+                        <!-- <Logo /> -->
                       </v-col>
                     </v-row>
                     <!---Left Part Logo -->

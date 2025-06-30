@@ -63,21 +63,6 @@ import { reactive,defineProps, onMounted, onBeforeMount, ref } from 'vue'
       },
   })
 
-  const base64toFile = (base_data, filename) => {
-
-      var arr = base_data.split(','),
-          mime = arr[0].match(/:(.*?);/)[1],
-          bstr = atob(arr[1]),
-          n = bstr.length,
-          u8arr = new Uint8Array(n);
-
-      while(n--){
-          u8arr[n] = bstr.charCodeAt(n);
-      }
-
-      return new File([u8arr], filename, {type:mime});
-  }
-
   const getImagesFromQuillDelta = (quillInstance) => {
     if (!quillInstance) {
       return [];

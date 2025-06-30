@@ -43,7 +43,7 @@ export default defineConfig(({command, mode}) => {
     server: {
       proxy: {
         '/api': {  //#1. axios라이브러리 등으로 http 요청인데 api로 시작하면,
-          target: 'http://127.0.0.1:8080',  //#2. 이쪽 주소로 매핑하여 백그라운드로 보내라.
+          target: env.BACKEND_URL,  //#2. 이쪽 주소로 매핑하여 백그라운드로 보내라.
           //target:  env.VITE_API_URL,  //#2. 이쪽 주소로 매핑하여 백그라운드로 보내라.
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '')
