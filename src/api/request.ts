@@ -1,6 +1,7 @@
 import axios from "axios";
 import { router } from '@/router';
 import { useCommonStore } from "@/stores/common";
+import { useAuthStore } from "@/stores/auth";
 axios.defaults.baseURL = import.meta.env.VITE_API_URL
 
 
@@ -34,6 +35,13 @@ request.interceptors.request.use(
 
     // 오류 요청을 보내기 전에 수행해야 할 일
     useCommonStore().hideProgressBar();
+
+  	// http status가 200인 아닌 경우 응답 바로 직전에 대해 작성.
+    if (error.response?.status === 401) {
+    }else if(error.response?.status === 403){
+      router.push('/login');
+    }
+
     return Promise.reject(error);
   }
 );
@@ -51,7 +59,9 @@ request.interceptors.response.use(
   	// http status가 200인 아닌 경우 응답 바로 직전에 대해 작성.
     if (error.response?.status === 401) {
     }else if(error.response?.status === 403){
-      router.push('/login');
+      alert("접근권한이없습니다.");
+      const authStore = useAuthStore()
+      authStore.logout();
     }
     return Promise.reject(error)
   }

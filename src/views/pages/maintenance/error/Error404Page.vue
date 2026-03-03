@@ -10,9 +10,9 @@
           <img src="@/assets/images/maintenance/img-error-text.svg" alt="build" class="CardMediaBuild" />
           <img src="@/assets/images/maintenance/img-error-purple.svg" alt="build" class="CardMediaBuild" />
         </div>
-        <h1 class="text-h1">Something is wrong</h1>
+        <h1 class="text-h1">잘못된 요청입니다.</h1>
         <p>
-          <small>The page you are looking was moved, removed, <br />renamed, or might never exist! </small>
+          <small> <br />존재하지않는 페이지입니다. </small>
         </p>
         <v-btn variant="flat" color="primary" class="mt-4" to="/" prepend-icon="$home"> Home</v-btn>
       </div>
