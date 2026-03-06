@@ -11,6 +11,7 @@ export const useLoginStore = defineStore({
     userRole: ''
   }),
   getters: {
+
   },
   actions: {
     async setAccessToken (token: string){
@@ -25,8 +26,11 @@ export const useLoginStore = defineStore({
     async getRefreshToken(){
       return this.accessToken
     },  
+    async getUserInfo(){
+      return this.$state
+    },    
     //유저 정보
-    async getUserInfo(loginDto: { id: string; pw: string; }){
+    async setUserInfo(loginDto: { id: string; pw: string; }){
       try {
 
           const param = {id : loginDto.id}

@@ -2,6 +2,8 @@ import axios from "axios";
 import { router } from '@/router';
 import { useCommonStore } from "@/stores/common";
 import { useAuthStore } from "@/stores/auth";
+import { useLoginStore } from "@/stores/login";
+import Cookies from "js-cookie";
 axios.defaults.baseURL = import.meta.env.VITE_API_URL
 
 
@@ -17,16 +19,17 @@ request.interceptors.request.use(
 
     useCommonStore().showProgressBar();
     // 스토리지에서 토큰을 가져온다.
-    const accessToken = localStorage.getItem('accessToken');
-    const refreshToken = localStorage.getItem('refreshToken');
+    const accessToken = Cookies.get('accessToken');
+    const refreshToken = Cookies.get('refreshToken');
 
+    console.log(accessToken)
     // 토큰이 있으면 요청 헤더에 추가한다.
     if (accessToken) {
         config.headers['Authorization'] = `Bearer ${accessToken}`;
     }
     // Refresh 토큰을 보낼 경우 사용하고자 하는 커스텀 인증 헤더를 사용하면 된다.
     if (refreshToken) {
-        config.headers['x-refresh-token'] = refreshToken;
+        config.headers['RrefreshToken'] = `Bearer ${refreshToken}`;
     }
 
     return config;
@@ -48,22 +51,49 @@ request.interceptors.request.use(
 
 // response 인터셉터
 request.interceptors.response.use(
-  (response) => {
+  (res) => {
     useCommonStore().hideProgressBar();
-        // http status가 200인 경우 응답 바로 직전에 대해 작성.
-        
-    	return response;
+    return res;
   },
-  (error) => {
+  async (error) => {
     useCommonStore().hideProgressBar();
-  	// http status가 200인 아닌 경우 응답 바로 직전에 대해 작성.
-    if (error.response?.status === 401) {
-    }else if(error.response?.status === 403){
-      alert("접근권한이없습니다.");
-      const authStore = useAuthStore()
-      authStore.logout();
+    const { config, response } = error;
+
+    // 401 에러이고 재시도한 적이 없을 때만 실행
+    if (response?.status === 401 && !config._retry) {
+      config._retry = true; // 재시도 표시 (무한루프 방지)
+
+      try {
+        const loginStore = useLoginStore();
+        const refreshToken = Cookies.get("refreshToken");
+
+        // 1. 토큰 갱신 요청
+        const { data } = await axios.post("/api/member/auth/refresh", 
+          { id: loginStore.userId },
+          { headers: { Authorization: `Bearer ${refreshToken}` }, baseURL: axios.defaults.baseURL }
+        );
+
+        // 2. 새로운 토큰 저장
+        loginStore.setAccessToken(data.accessToken);
+        loginStore.setRefreshToken(data.refreshToken);
+        Cookies.set('accessToken', data.accessToken, { expires: 1 / 48 });
+        Cookies.set('refreshToken', data.refreshToken, { expires: 7 });
+
+        // 3. 원래 실패했던 요청의 헤더를 새 토큰으로 교체 후 재실행
+        config.headers.Authorization = `Bearer ${data.accessToken}`;
+        return axios(config); 
+        
+      } catch (refreshError) {
+        // 리프레시 토큰마저 만료된 경우 로그아웃
+        //useAuthStore().logout();
+        router.push('/login');
+
+        return Promise.reject(refreshError);
+      }
     }
-    return Promise.reject(error)
+
+    if (response?.status === 403) alert("권한이 없습니다.");
+    return Promise.reject(error);
   }
 );
 

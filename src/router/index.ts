@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import MainRoutes from './MainRoutes';
 import { defineAsyncComponent } from 'vue';
+import Cookies from 'js-cookie';
 
 export const router =createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -32,7 +33,7 @@ export const router =createRouter({
 router.beforeEach(async (to, _from, next) => {
 
   // isAuth가 토큰 자체인지, boolean인지 명확히 가정. 여기서는 boolean으로 가정.
-  const isAuthenticated = localStorage.getItem('accessToken'); // 예시: 인증 상태 boolean 반환 메서드
+  const isAuthenticated = Cookies.get('accessToken'); // 예시: 인증 상태 boolean 반환 메서드
 
   // 로그인 라우트 이름 확인 (예: 'login')
   const loginRouteName = 'login';

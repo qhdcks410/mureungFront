@@ -2,15 +2,10 @@ import { defineStore } from 'pinia';
 import { router } from '@/router';
 import { useLoginStore } from '@/stores/login';
 import request from '@/api/request';
+import Cookies from 'js-cookie';
 
-export const useAuthStore = defineStore({
-  id: 'auth',
-  
+export const useAuthStore = defineStore('auth',{
   state: () => ({
-    // initialize state from local storage to enable user to stay logged in
-    /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
-    // @ts-ignore
-    user: JSON.parse(localStorage.getItem('user')),
     returnUrl: null
   }),
   actions: {
@@ -30,27 +25,27 @@ export const useAuthStore = defineStore({
           await loginStore.setAccessToken(response.data.accessToken)
           await loginStore.setRefreshToken(response.data.refreshToken)
 
-          localStorage.setItem('accessToken', response.data.accessToken)
-          localStorage.setItem('refreshToken', response.data.refreshToken)
-          await loginStore.getUserInfo(loginDto);
+          Cookies.set('accessToken', response.data.accessToken, { expires: 1 / 48 });
+          Cookies.set('refreshToken', response.data.refreshToken, { expires: 7 });
+          loginStore.setUserInfo(loginDto);
 
           router.push(redirect || '/customer');
       }
-
-      // const user = await fetchWrapper.post(`${baseUrl}/authenticate`, { username, password });
-
-      // // update pinia state
-      // this.user = user;
-      // // store user details and jwt in local storage to keep user logged in between page refreshes
-      // localStorage.setItem('user', JSON.stringify(user));
-      // // redirect to previous url or default to home page
       
     },
-    logout() {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      useLoginStore().$reset()
-      router.push('/login');
+    async logout() {
+      const loginStore  = useLoginStore();
+      const loginDto = {
+        id: loginStore.userId
+      }
+      const response = await request.post('/api/member/logOut',loginDto);
+
+      if (response.status === 200) {
+        Cookies.remove('accessToken');
+        Cookies.remove('refreshToken');
+        useLoginStore().$reset()
+        router.push('/login');
+      }
     }
   }
 });
