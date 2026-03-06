@@ -34,6 +34,7 @@ export const useAuthStore = defineStore('auth',{
       
     },
     async logout() {
+      //로그아웃
       const loginStore  = useLoginStore();
       const loginDto = {
         id: loginStore.userId
