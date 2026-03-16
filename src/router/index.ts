@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import MainRoutes from './MainRoutes';
 import { defineAsyncComponent } from 'vue';
 import Cookies from 'js-cookie';
+import { useLoginStore } from '@/stores/login';
 
 export const router =createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,27 +32,22 @@ export const router =createRouter({
 
 
 router.beforeEach(async (to, _from, next) => {
-
-  // isAuth가 토큰 자체인지, boolean인지 명확히 가정. 여기서는 boolean으로 가정.
-  const isAuthenticated = Cookies.get('accessToken'); // 예시: 인증 상태 boolean 반환 메서드
-
-  // 로그인 라우트 이름 확인 (예: 'login')
+  const isAuthenticated = !!Cookies.get('accessToken'); // 토큰 존재 여부를 boolean으로 변환
   const loginRouteName = 'login';
-  // 로그인 후 리디렉션될 기본 라우트 이름 (예: 'DashboardHome')
-  const main = 'custom';
 
+  // 1. 로그인이 필요한 페이지인데 토큰이 없는 경우
   if (to.name !== loginRouteName && !isAuthenticated) {
-    // 로그인이 필요한 페이지 + 로그인 안됨 => 로그인 페이지로 리디렉션
-    console.log('Redirecting to login page.');
     next({
-      name: 'login',
-      state: { redirect: to.fullPath } // 로그인 후 돌아갈 경로 전달
+      name: loginRouteName,
+      query: { redirect: to.fullPath } // state 대신 query를 쓰면 URL 유지에 유리함
     });
-  } else if (to.name === loginRouteName && isAuthenticated) {
-    // 로그인 페이지에서 다른 곳으로 리디렉션할 때는 redirect 쿼리 불필요
-    next({ name: main });
-  } else {
-
+  } 
+  // 2. 이미 로그인했는데 로그인 페이지로 가려는 경우
+  else if (to.name === loginRouteName && isAuthenticated) {
+    next({ name: 'custom' }); // 메인(custom) 페이지로 리다이렉트
+  } 
+  // 3. 그 외 모든 경우 (정상 통과)
+  else {
     next();
   }
 });

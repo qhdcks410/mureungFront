@@ -1,45 +1,28 @@
 <script setup lang="ts">
-// imported components
-import TotalEarning from './components/TotalEarning.vue';
-import TotalOrder from './components/TotalOrder.vue';
-import TotalIncome from './components/TotalIncome.vue';
-import TotalGrowth from './components/TotalGrowth.vue';
-import PopularStocks from './components/PopularStocks.vue';
+import { ref, onMounted } from 'vue';
+
+// 개편된 비즈니스 컴포넌트 임포트
+import TodaySummaryCards from './components/TodaySummaryCards.vue';
+import RevenueGrowthChart from './components/RevenueGrowthChart.vue';
+import RecentOrdersTable from './components/RecentOrdersTable.vue'; // 기존 PopularStocks 대체 가능
+
 </script>
 
 <template>
   <v-row>
-    <!-- -------------------------------------------------------------------- -->
-    <!-- Total Earning -->
-    <!-- -------------------------------------------------------------------- -->
-    <v-col cols="12" md="4">
-      <TotalEarning />
-    </v-col>
-    <!-- -------------------------------------------------------------------- -->
-    <!-- Total Order -->
-    <!-- -------------------------------------------------------------------- -->
-    <v-col cols="12" md="4">
-      <TotalOrder />
-    </v-col>
-    <!-- -------------------------------------------------------------------- -->
-    <!-- Total Income -->
-    <!-- -------------------------------------------------------------------- -->
-    <v-col cols="12" md="4">
-      <TotalIncome />
+    <!-- [1] 상단 요약 영역: 오늘 주문, 픽업, 배송 현황 -->
+    <v-col cols="12">
+      <TodaySummaryCards />
     </v-col>
 
-    <!-- -------------------------------------------------------------------- -->
-    <!-- Total Growth -->
-    <!-- -------------------------------------------------------------------- -->
-    <v-col cols="12" lg="8">
-      <TotalGrowth />
+    <!-- [2] 메인 차트 영역: 매출 분석 (당일/월별) -->
+    <v-col cols="12" md="8">
+      <RevenueGrowthChart />
     </v-col>
 
-    <!-- -------------------------------------------------------------------- -->
-    <!-- Popular Stocks -->
-    <!-- -------------------------------------------------------------------- -->
-    <v-col cols="12" lg="4">
-      <PopularStocks />
+    <!-- [3] 사이드 영역: 최근 주문 또는 주요 알림 -->
+    <v-col cols="12" md="4">
+      <RecentOrdersTable title="최근 주문 내역" />
     </v-col>
   </v-row>
 </template>

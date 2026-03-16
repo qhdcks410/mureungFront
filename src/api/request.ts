@@ -1,7 +1,5 @@
 import axios from "axios";
-import { router } from '@/router';
 import { useCommonStore } from "@/stores/common";
-import { useAuthStore } from "@/stores/auth";
 import { useLoginStore } from "@/stores/login";
 import Cookies from "js-cookie";
 axios.defaults.baseURL = import.meta.env.VITE_API_URL
@@ -40,9 +38,8 @@ request.interceptors.request.use(
     useCommonStore().hideProgressBar();
 
   	// http status가 200인 아닌 경우 응답 바로 직전에 대해 작성.
-    if (error.response?.status === 401) {
-    }else if(error.response?.status === 403){
-      router.push('/login');
+    if (error.response?.status === 401 && error.response?.status === 403) {
+      window.location.href ='/login';
     }
 
     return Promise.reject(error);
@@ -67,6 +64,8 @@ request.interceptors.response.use(
         const loginStore = useLoginStore();
         const refreshToken = Cookies.get("refreshToken");
 
+        if(!loginStore.userId) window.location.href ='/login'
+
         // 1. 토큰 갱신 요청
         const { data } = await axios.post("/api/member/auth/refresh", 
           { id: loginStore.userId },
@@ -85,14 +84,20 @@ request.interceptors.response.use(
         
       } catch (refreshError) {
         // 리프레시 토큰마저 만료된 경우 로그아웃
-        //useAuthStore().logout();
-        router.push('/login');
+        Cookies.remove('accessToken')
+        Cookies.remove('refreshToken')        
+        window.location.href ='/login';
 
         return Promise.reject(refreshError);
       }
     }
 
-    if (response?.status === 403) alert("권한이 없습니다.");
+    if (response?.status === 403) {
+      alert("권한이 없습니다.");
+      Cookies.remove('accessToken')
+      Cookies.remove('refreshToken')
+      window.location.href ='/login';
+    }
     return Promise.reject(error);
   }
 );

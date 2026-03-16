@@ -11,7 +11,7 @@
       <template v-slot:default>
         <v-card title="상담내용">
         <template v-slot:text>
-          <QuillEditor v-model:value="props.connValue" :read-only="true" />
+          <QuillEditor v-model:value="props.connValue" :read-only="true" :img-files="props.imgFiles" />
           <!-- <v-textarea :model-value="props.connValue" label="" rows="20"></v-textarea> -->
         </template>
         <template v-slot:actions>
@@ -33,7 +33,8 @@ import QuillEditor from './QuillEditor.vue'
 // v-model을 사용하기 위해 'modelValue'라는 이름의 prop을 정의합니다.
 const props = defineProps({
   modelValue: Boolean, // Boolean 타입의 modelValue prop (v-model="상태" 에서 '상태'가 전달됨)
-  connValue: String
+  connValue: String,
+  imgFiles: Array
 })
 
 // v-model을 사용하기 위해 'update:modelValue' 이벤트를 정의합니다.
