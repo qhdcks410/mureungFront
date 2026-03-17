@@ -29,7 +29,7 @@ export const useAuthStore = defineStore('auth',{
           Cookies.set('refreshToken', response.data.refreshToken, { expires: 7 });
           loginStore.setUserInfo(loginDto);
 
-          router.push(redirect || '/customer');
+          router.push(redirect || '/dashboard/default');
       }
       
     },

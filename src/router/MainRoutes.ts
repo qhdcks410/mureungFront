@@ -5,7 +5,7 @@ const MainRoutes = {
   meta: {
     requiresAuth: true
   },
-  redirect: '/main/customer',
+  redirect: '/dashboard/default',
   component: defineAsyncComponent(() => import('@/layouts/full/FullLayout.vue')),
   children: [
     {

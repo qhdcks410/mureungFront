@@ -22,26 +22,11 @@ const common = useCommonStore();
       <VerticalHeaderVue />
       <v-main>
         <ProgressBar :is-show="common.isShowProgress"/>
-        
         <v-container fluid class="page-wrapper">
-          <div>
-            <RouterView />
-            <!-- <v-btn
-              class="customizer-btn"
-              size="large"
-              icon
-              variant="flat"
-              color="secondary"
-              @click.stop="customizer.SET_CUSTOMIZER_DRAWER(!customizer.Customizer_drawer)"
-            >
-              <SettingsIcon class="icon" />
-            </v-btn> -->
-          </div>
+          <RouterView />
         </v-container>
         <v-container fluid class="pt-0">
-          <div>
-            <FooterPanel />
-          </div>
+          <FooterPanel />
         </v-container>
       </v-main>
     </v-app>

@@ -1,0 +1,101 @@
+// --------------------------------------------------
+// Custom Application Styles
+// --------------------------------------------------
+
+// [1] Layout & Global Utilities
+.dashboard-main-container {
+  height: calc(100vh - 120px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  @media (max-width: 960px) {
+    height: auto !important;
+    display: block !important;
+    overflow: visible !important;
+  }
+}
+
+.flex-none { flex: none !important; }
+.flex-grow-1 { flex-grow: 1 !important; min-height: 0; }
+.h-100 { height: 100% !important; }
+
+// [2] Dashboard Components (RecentOrdersTable)
+.order-card {
+  border: 1px solid #f8f8f8 !important;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: rgba(var(--v-theme-primary), 0.2) !important;
+    background: #fafafa;
+    transform: translateY(-2px);
+  }
+
+  &.completed-card {
+    border-color: #eee !important;
+    opacity: 0.7;
+    cursor: default;
+  }
+}
+
+.card-side-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  z-index: 2;
+}
+
+// [3] Scrollbar & Containers
+.scroll-container {
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #eee;
+    border-radius: 10px;
+    &:hover {
+      background: #ccc;
+    }
+  }
+
+  @media (max-width: 960px) {
+    height: auto !important;
+    overflow-y: visible !important;
+    flex-grow: 0 !important;
+  }
+}
+
+// [4] Header & Navigation
+.search-sheet {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  height: 80px;
+  display: flex;
+  align-items: center;
+}
+
+.shadow-primary {
+  box-shadow: 0 4px 15px rgba(var(--v-theme-primary), 0.3) !important;
+}
+
+// [5] Buttons & UI Elements
+.pickup-btn {
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  &:hover { transform: scale(1.05); }
+  &:active { transform: scale(0.95); }
+}
+
+.gap-2 { gap: 8px !important; }
+.gap-4 { gap: 16px !important; }
+
+// Vuetify Overrides
+.v-field__outline {
+  --v-field-border-opacity: 0.1 !important;
+}

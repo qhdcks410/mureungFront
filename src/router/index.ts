@@ -44,7 +44,7 @@ router.beforeEach(async (to, _from, next) => {
   } 
   // 2. 이미 로그인했는데 로그인 페이지로 가려는 경우
   else if (to.name === loginRouteName && isAuthenticated) {
-    next({ name: 'custom' }); // 메인(custom) 페이지로 리다이렉트
+    next({ name: 'Default' }); // 대시보드(Default) 페이지로 리다이렉트
   } 
   // 3. 그 외 모든 경우 (정상 통과)
   else {

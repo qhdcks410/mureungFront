@@ -35,7 +35,7 @@ onMounted(() => loadStats());
           <div class="d-flex align-center justify-space-between">
             <div>
               <p class="text-white text-h6 opacity-80 mb-1">오늘 주문</p>
-              <h2 class="text-white text-h3 font-weight-bold">{{ stats.todOrdCnt }}건</h2>
+              <h2 class="text-white text-h3 font-weight-bold">{{ stats.todOrdCnt.toLocaleString() }}건</h2>
             </div>
             <v-avatar size="54" color="white" class="opacity-20">
               <v-icon icon="$accountSearch" size="32" color="primary" />
@@ -52,7 +52,7 @@ onMounted(() => loadStats());
           <div class="d-flex align-center justify-space-between">
             <div>
               <p class="text-white text-h6 opacity-80 mb-1">픽업 대기</p>
-              <h2 class="text-white text-h3 font-weight-bold">{{ stats.pickCnt }}건</h2>
+              <h2 class="text-white text-h3 font-weight-bold">{{ stats.pickCnt.toLocaleString() }}건</h2>
             </div>
             <v-avatar size="54" color="white" class="opacity-20">
               <v-icon icon="$calendarClock" size="32" color="secondary" />
@@ -80,7 +80,7 @@ onMounted(() => loadStats());
       <v-card elevation="10" class="bg-info overflow-hidden">
         <v-card-text class="pa-5 text-white">
           <p class="text-h6 opacity-80 mb-1">배송 수량</p>
-          <h2 class="text-h3 font-weight-bold">{{ stats.deQy }}건</h2>
+          <h2 class="text-h3 font-weight-bold">{{ stats.deQy.toLocaleString() }}건</h2>
         </v-card-text>
       </v-card>
     </v-col>

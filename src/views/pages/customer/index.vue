@@ -11,6 +11,7 @@ import UiParentCard from '@/components/shared/UiParentCard.vue';
 import Dialogs from '@/components/apps/Dialogs.vue';
 import QuillEditor from '@/components/apps/QuillEditor.vue';
 import CustomerPopup from '@/components/popup/CustomerPopup.vue';
+import QuickOrderDialog from '@/components/popup/QuickOrderDialog.vue';
 
 /**
  * 1. 상태 관리 (State)
@@ -23,8 +24,8 @@ const displayCount = ref(10); // 모바일 무한 스크롤 초기 개수
 
 // 다이얼로그 제어
 const isActive = ref(false);    // 상세 팝업
-const isRegiter = ref(false);   // 등록 팝업
-const isModify = ref(false);    // 수정 팝업
+const isRegiter = ref(false);   // 등록 팝업 (QuickOrderDialog와 연결)
+const isModify = ref(false);    // 수정 팝업 (기존 상세 수정 다이얼로그)
 const isCustomerPopup = ref(false); // 고객 선택 팝업
 
 const selectCustomer = (customer: any) => {
@@ -52,7 +53,7 @@ const formattedAmt = computed({
   }
 });
 
-// 기타금액 콤마용 상태
+// 금액 콤마용 상태
 const formattedOtherAmt = computed({
   get: () => formatCurrency(saveItem.ordOtherAmt),
   set: (val) => {
@@ -138,7 +139,7 @@ const allHeaders = ref([
   { align: 'center', key: 'cusChnnel', title: '주문채널', minWidth: '120px' },
   { align: 'center', key: 'payMd', title: '결제수단', minWidth: '100px' },
   { align: 'center', key: 'payNt', title: '결제여부', minWidth: '100px' },
-  { align: 'center', key: 'ordAmt', title: '기타금액', minWidth: '120px' },
+  { align: 'center', key: 'ordAmt', title: '금액', minWidth: '120px' },
   { align: 'center', key: 'ordOtherAmt', title: '예약금', minWidth: '120px' },
   { align: 'center', key: 'cusNm', title: '고객명', minWidth: '100px' },
   { align: 'center', key: 'cusPhone', title: '전화번호', minWidth: '130px' },
@@ -182,7 +183,7 @@ const saveOrder = () => {
     { key: 'cusChnnel', label: '상담채널' },
     { key: 'payMd', label: '결제수단' },
     { key: 'payNt', label: '결제방법' },
-    { key: 'ordAmt', label: '기타금액' },
+    { key: 'ordAmt', label: '금액' },
     { key: 'cusNm', label: '고객이름' },
     { key: 'cusPhone', label: '전화번호' },
     { key: 'ordDate', label: '픽업날짜' },
@@ -219,7 +220,7 @@ const modifyOrder = () => {
     { key: 'cusChnnel', label: '상담채널' },
     { key: 'payMd', label: '결제수단' },
     { key: 'payNt', label: '결제방법' },
-    { key: 'ordAmt', label: '기타금액' },
+    { key: 'ordAmt', label: '금액' },
     { key: 'ordDate', label: '픽업날짜' },
     { key: 'prodNm', label: '상품명' }
   ];
@@ -284,7 +285,7 @@ const handleRowClick = (item: any) => {
     searchImageFiles.value = [...res.data];
     Object.assign(saveItem, item);
     
-    // 시간 분리하여 세팅 (HH:mm -> HH / mm)
+    // 시간 분리하여 세팅 (HH:mm -> HH / m)
     if (item.ordTime && item.ordTime.includes(':')) {
       const [h, m] = item.ordTime.split(':');
       hourPart.value = h.padStart(2, '0');
@@ -610,56 +611,10 @@ onMounted(async () => {
   <!-- [3] 팝업 레이어 영역 -->
   <Dialogs v-model="isActive" :conn-value="connValue" :img-files="searchImageFiles" />
 
-  <!-- 등록 다이얼로그 -->
-  <v-dialog v-model="isRegiter" max-width="800">
-    <v-card title="주문등록">
-      <v-card-text>
-        <v-select v-model="saveItem.cusChnnel" :items="cusChnnel" item-title="lable" item-value="value" label="상담채널 *" persistent-hint variant="outlined" color="secondary" />
-        <v-select v-model="saveItem.payMd" :items="payMd" item-title="lable" item-value="value" label="결제수단 *" variant="outlined" color="secondary" />
-        <v-select v-model="saveItem.payNt" :items="payNt" item-title="lable" item-value="value" label="결제방법 *" variant="outlined" color="secondary" />
-        <v-text-field v-model="formattedOtherAmt" label="예약금" prefix="₩" suffix="원" variant="outlined" color="secondary" />
-        <v-text-field v-model="formattedAmt" label="기타금액 *" prefix="₩" suffix="원" variant="outlined" color="secondary" />
-        
-        <!-- 고객 선택 통합 버튼 (등록) -->
-        <div class="mb-4">
-          <v-label class="text-caption mb-1">고객 정보 *</v-label>
-          <v-btn
-            block
-            variant="outlined"
-            :color="saveItem.cusNm ? 'primary' : 'grey-lighten-1'"
-            height="56"
-            class="justify-start px-4 text-none"
-            @click="isCustomerPopup = true"
-          >
-            <v-icon start icon="$accountSearch" />
-            <div v-if="saveItem.cusNm" class="text-left">
-              <div class="text-body-1 font-weight-bold">{{ saveItem.cusNm }}</div>
-              <div class="text-caption">{{ formatPhone(saveItem.cusPhone) }}</div>
-            </div>
-            <span v-else class="text-body-1">고객을 선택해주세요</span>
-          </v-btn>
-        </div>
+  <!-- 상세 주문 등록 공용 컴포넌트 사용 (중복 코드 제거) -->
+  <QuickOrderDialog v-model="isRegiter" @success="getOrerList" />
 
-        <v-text-field v-model="saveItem.ordDate" label="픽업날짜 *" type="date" variant="outlined" color="secondary" />
-        <v-row no-gutters>
-          <v-col cols="6" class="pr-2">
-            <v-select v-model="hourPart" :items="hourOptions" label="시 *" variant="outlined" color="secondary" suffix="시" />
-          </v-col>
-          <v-col cols="6">
-            <v-select v-model="minPart" :items="minOptions" label="분 *" variant="outlined" color="secondary" suffix="분" />
-          </v-col>
-        </v-row>
-
-        <v-text-field v-model="saveItem.prodNm" label="상품명 *" variant="outlined" color="secondary" />
-        <QuillEditor v-model:value="saveItem.conn" @update:model-value="setUpdateConn" />
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer />
-        <v-btn variant="outlined" color="secondary" @click="isRegiter = false">취소</v-btn>
-        <v-btn variant="outlined" color="secondary" @click="saveOrder">확인</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+  <!-- 수정 다이얼로그 -->
 
   <!-- 수정 다이얼로그 -->
   <v-dialog v-model="isModify" max-width="800">
@@ -669,7 +624,7 @@ onMounted(async () => {
         <v-select v-model="saveItem.payMd" :items="payMd" item-title="lable" item-value="value" label="결제수단 *" variant="outlined" color="secondary" />
         <v-select v-model="saveItem.payNt" :items="payNt" item-title="lable" item-value="value" label="결제방법 *" variant="outlined" color="secondary" />
         <v-text-field v-model="formattedOtherAmt" label="예약금" prefix="₩" suffix="원" variant="outlined" color="secondary" />
-        <v-text-field v-model="formattedAmt" label="기타금액 *" prefix="₩" suffix="원" variant="outlined" color="secondary" />
+        <v-text-field v-model="formattedAmt" label="금액 *" prefix="₩" suffix="원" variant="outlined" color="secondary" />
         
         <!-- 고객 선택 통합 버튼 (수정) -->
         <div class="mb-4">

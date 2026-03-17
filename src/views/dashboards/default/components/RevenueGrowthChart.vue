@@ -15,6 +15,9 @@ const series = ref([
   }
 ]);
 
+const monAmt = ref([])
+const growthRate = ref([])
+
 // 3. chartOptions에서 categories123.value를 참조하도록 수정
 const chartOptions = computed(() => ({
   chart: {
@@ -43,6 +46,7 @@ const loadChartData = async () => {
   try {
     // async/await 방식으로 통일
     const response = await request.post('/api/dashBoard/getDashBoardGraphList');
+    const monthResponse = await request.post('/api/dashBoard/getMonthDashBoardList');
     
     if (response.data) {
       const categories = response.data.map((i: any) => i.dt);
@@ -54,6 +58,11 @@ const loadChartData = async () => {
           name: "일별 매출",  
           data: totalAmts
       }];
+    }
+
+    if(monthResponse.data){
+      monAmt.value = monthResponse.data[0].monAmt
+      growthRate.value = monthResponse.data[0].growthRate
     }
   } catch (e) {
     console.error('Stats load failed', e);
@@ -73,9 +82,9 @@ onMounted(() => {
       <div class="d-flex align-center mb-5">
         <div>
           <h6 class="text-subtitle-1 text-grey-darken-1 mb-1">달별 매출액 합계</h6>
-          <h3 class="text-h4 font-weight-bold">₩ 8,250,000</h3>
+          <h3 class="text-h4 font-weight-bold">₩ {{monAmt.toLocaleString()}}</h3>
         </div>
-        <v-chip color="success" size="small" class="ml-3">+12.5%</v-chip>
+        <v-chip color="success" size="small" class="ml-3">{{growthRate}} %</v-chip>
       </div>
       
       <!-- 차트 영역 -->
