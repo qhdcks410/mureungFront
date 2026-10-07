@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import request from '@/api/request';
-import type { AxiosResponse } from 'axios';
 
 // 상태 관리
 const stats = ref({
@@ -13,11 +12,14 @@ const stats = ref({
 
 const loadStats = async () => {
   try {
-    request.post('/api/dashBoard/getDashBoardList').then((response: AxiosResponse) => {
-      stats.value.todOrdCnt = response.data[0]?.todOrdCnt
-      stats.value.pickCnt = response.data[0]?.pickCnt
-      stats.value.todAmt = response.data[0]?.todAmt
-    });
+    const response = await request.post('/api/dashBoard/getDashBoardList');
+    if (response.data && response.data.length > 0) {
+      const data = response.data[0];
+      stats.value.todOrdCnt = data.todOrdCnt || 0;
+      stats.value.pickCnt = data.pickCnt || 0;
+      stats.value.todAmt = data.todAmt || 0;
+      stats.value.deQy = data.deQy || 0;
+    }
   } catch (e) {
     console.error('Stats load failed', e);
   }
@@ -30,15 +32,15 @@ onMounted(() => loadStats());
   <v-row>
     <!-- 오늘 주문 건수 -->
     <v-col cols="12" sm="6" lg="3">
-      <v-card elevation="10" class="bg-primary overflow-hidden bubble-shape">
+      <v-card elevation="0" class="with-border bg-primary overflow-hidden bubble-shape shadow-modern rounded-lg">
         <v-card-text class="pa-5">
           <div class="d-flex align-center justify-space-between">
             <div>
               <p class="text-white text-h6 opacity-80 mb-1">오늘 주문</p>
               <h2 class="text-white text-h3 font-weight-bold">{{ stats.todOrdCnt.toLocaleString() }}건</h2>
             </div>
-            <v-avatar size="54" color="white" class="opacity-20">
-              <v-icon icon="$accountSearch" size="32" color="primary" />
+            <v-avatar size="48" color="white" class="opacity-20 rounded-md">
+              <v-icon icon="$accountSearch" size="28" color="primary" />
             </v-avatar>
           </div>
         </v-card-text>
@@ -47,15 +49,15 @@ onMounted(() => loadStats());
 
     <!-- 픽업 대기 -->
     <v-col cols="12" sm="6" lg="3">
-      <v-card elevation="10" class="bg-secondary overflow-hidden bubble-shape-2">
+      <v-card elevation="0" class="with-border bg-secondary overflow-hidden bubble-shape shadow-modern rounded-lg">
         <v-card-text class="pa-5">
           <div class="d-flex align-center justify-space-between">
             <div>
               <p class="text-white text-h6 opacity-80 mb-1">픽업 대기</p>
               <h2 class="text-white text-h3 font-weight-bold">{{ stats.pickCnt.toLocaleString() }}건</h2>
             </div>
-            <v-avatar size="54" color="white" class="opacity-20">
-              <v-icon icon="$calendarClock" size="32" color="secondary" />
+            <v-avatar size="48" color="white" class="opacity-20 rounded-md">
+              <v-icon icon="$calendarClock" size="28" color="secondary" />
             </v-avatar>
           </div>
         </v-card-text>
@@ -64,12 +66,12 @@ onMounted(() => loadStats());
 
     <!-- 당일 매출 -->
     <v-col cols="12" sm="6" lg="3">
-      <v-card elevation="10" class="bg-success overflow-hidden">
+      <v-card elevation="0" class="with-border bg-success overflow-hidden bubble-shape shadow-modern rounded-lg">
         <v-card-text class="pa-5 text-white">
           <p class="text-h6 opacity-80 mb-1">당일 매출</p>
           <div class="d-flex align-end">
             <h2 class="text-h3 font-weight-bold">₩{{ stats.todAmt.toLocaleString() }}</h2>
-            <span class="text-caption ml-2 mb-1">예약금 합계</span>
+            <span class="text-caption ml-2 mb-1 opacity-70">예약금 합계</span>
           </div>
         </v-card-text>
       </v-card>
@@ -77,7 +79,7 @@ onMounted(() => loadStats());
 
     <!-- 배송 수량 -->
     <v-col cols="12" sm="6" lg="3">
-      <v-card elevation="10" class="bg-info overflow-hidden">
+      <v-card elevation="0" class="with-border bg-info overflow-hidden bubble-shape shadow-modern rounded-lg">
         <v-card-text class="pa-5 text-white">
           <p class="text-h6 opacity-80 mb-1">배송 수량</p>
           <h2 class="text-h3 font-weight-bold">{{ stats.deQy.toLocaleString() }}건</h2>
@@ -88,27 +90,5 @@ onMounted(() => loadStats());
 </template>
 
 <style scoped>
-.bubble-shape {
-  position: relative;
-}
-.bubble-shape::after {
-  content: "";
-  position: absolute;
-  width: 210px;
-  height: 210px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  top: -125px;
-  right: -15px;
-}
-.bubble-shape-2::after {
-  content: "";
-  position: absolute;
-  width: 210px;
-  height: 210px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  top: -160px;
-  right: -130px;
-}
+/* 전역 bubble-shape 클래스 사용으로 컴포넌트 내 스타일 제거 */
 </style>

@@ -5,13 +5,21 @@ import {
   mdiEye, 
   mdiMagnify, 
   mdiAccount, 
+  mdiAccountOutline,
+  mdiLockOutline,
   mdiAccountSearch, 
   mdiChevronRight, 
   mdiCalendarClock, 
   mdiPhoneOutline, 
   mdiAccountCircle, 
   mdiPencilOutline,
-  mdiAccountOffOutline
+  mdiAccountOffOutline,
+  mdiAlertCircleOutline,
+  mdiRefresh,
+  mdiPlus,
+  mdiFileExcel,
+  mdiDeleteOutline,
+  mdiFormatListBulleted
 } from '@mdi/js';
 
 export const icons = {
@@ -21,11 +29,19 @@ export const icons = {
   eye: mdiEye,
   magnify: mdiMagnify,
   account: mdiAccount,
+  accountOutline: mdiAccountOutline,
+  lockOutline: mdiLockOutline,
   accountSearch: mdiAccountSearch,
   chevronRight: mdiChevronRight,
   calendarClock: mdiCalendarClock,
   phoneOutline: mdiPhoneOutline,
   accountCircle: mdiAccountCircle,
   pencilOutline: mdiPencilOutline,
-  accountOffOutline: mdiAccountOffOutline
+  accountOffOutline: mdiAccountOffOutline,
+  alertCircleOutline: mdiAlertCircleOutline,
+  refresh: mdiRefresh,
+  plus: mdiPlus,
+  fileExcel: mdiFileExcel,
+  deleteOutline: mdiDeleteOutline,
+  formatListBulleted: mdiFormatListBulleted
 };

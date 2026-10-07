@@ -25,15 +25,38 @@ export default createVuetify({
     }
   },
   defaults: {
-    VBtn: {},
+    VBtn: {
+      rounded: 'lg',
+      elevation: 0,
+      variant: 'flat',
+      color: 'primary',
+      class: 'text-none font-weight-bold tracking-tight'
+    },
     VCard: {
-      rounded: 'md'
+      rounded: 'xl',
+      elevation: 0,
+      variant: 'flat',
+      class: 'border-thin border-borderLight'
     },
     VTextField: {
-      rounded: 'lg'
+      rounded: 'lg',
+      variant: 'outlined',
+      density: 'comfortable',
+      color: 'primary',
+      bgColor: 'surface',
+      persistentPlaceholder: true
+    },
+    VSelect: {
+      rounded: 'lg',
+      variant: 'outlined',
+      density: 'comfortable',
+      color: 'primary',
+      bgColor: 'surface'
+    },
+    VDataTable: {
+      class: 'border-thin border-borderLight rounded-xl overflow-hidden'
     },
     VTooltip: {
-      // set v-tooltip default location to top
       location: 'top'
     }
   }

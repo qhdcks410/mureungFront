@@ -134,7 +134,22 @@ const saveOrder = async () => {
   
   const fd = new FormData();
   imageFiles.value.forEach((img: any, idx: number) => {
-    fd.append('editorFiles', base64toFile(img, `img${idx}`));
+
+    let extension = '.jpg'; // 기본값 설정
+    
+    if (img && img.includes(';base64')) {
+      const mimeType = img.split(';base64')[0].split(':')[1]; // "image/png" 추출
+      // 💡 2. MimeType에 맞는 확장자 매핑
+      if (mimeType.includes('png')) {
+        extension = '.png';
+      } else if (mimeType.includes('gif')) {
+        extension = '.gif';
+      } else if (mimeType.includes('webp')) {
+        extension = '.webp';
+      } // jpeg, jpg 등은 기본값 '.jpg'를 따름
+    }
+
+    fd.append('editorFiles', base64toFile(img, `img${idx}${extension}`));
   });
 
   // 이미지 URL 치환 처리

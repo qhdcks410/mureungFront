@@ -8,33 +8,33 @@ const PurpleTheme: ThemeTypes = {
     'carousel-control-size': 10
   },
   colors: {
-    primary: '#1e88e5',
-    secondary: '#5e35b1',
-    info: '#03c9d7',
-    success: '#00c853',
-    accent: '#FFAB91',
-    warning: '#ffc107',
-    error: '#f44336',
-    lightprimary: '#eef2f6',
-    lightsecondary: '#ede7f6',
-    lightsuccess: '#b9f6ca',
-    lighterror: '#f9d8d8',
-    lightwarning: '#fff8e1',
-    darkText: '#212121',
-    lightText: '#616161',
-    darkprimary: '#1565c0',
-    darksecondary: '#4527a0',
-    borderLight: '#d0d0d0',
-    inputBorder: '#787878',
-    containerBg: '#eef2f6',
-    surface: '#fff',
-    'on-surface-variant': '#fff',
-    facebook: '#4267b2',
+    primary: '#4f46e5', // Indigo 600
+    secondary: '#64748b', // Slate 500
+    info: '#0ea5e9', // Sky 500
+    success: '#10b981', // Emerald 500
+    accent: '#f59e0b', // Amber 500
+    warning: '#f97316', // Orange 500
+    error: '#ef4444', // Red 500
+    lightprimary: '#eef2ff',
+    lightsecondary: '#f1f5f9',
+    lightsuccess: '#ecfdf5',
+    lighterror: '#fef2f2',
+    lightwarning: '#fff7ed',
+    darkText: '#1e293b',
+    lightText: '#64748b',
+    darkprimary: '#3730a3',
+    darksecondary: '#475569',
+    borderLight: '#e2e8f0',
+    inputBorder: '#cbd5e1',
+    containerBg: '#f8fafc',
+    surface: '#ffffff',
+    'on-surface-variant': '#ffffff',
+    facebook: '#1877f2',
     twitter: '#1da1f2',
-    linkedin: '#0e76a8',
-    gray100: '#fafafa',
-    primary200: '#90caf9',
-    secondary200: '#b39ddb'
+    linkedin: '#0a66c2',
+    gray100: '#f8fafc',
+    primary200: '#c7d2fe',
+    secondary200: '#e2e8f0'
   }
 };
 

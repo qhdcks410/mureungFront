@@ -5,6 +5,15 @@ import { useDisplay } from 'vuetify';
 import { useRoute } from 'vue-router';
 import type { AxiosResponse } from 'axios';
 import request from '@/api/request';
+import * as XLSX from 'xlsx';
+import { 
+  mdiRefresh, 
+  mdiFileExcel, 
+  mdiPlus, 
+  mdiDeleteOutline, 
+  mdiFormatListBulleted,
+  mdiMagnify
+} from '@mdi/js';
 
 // 컴포넌트 임포트
 import UiParentCard from '@/components/shared/UiParentCard.vue';
@@ -327,6 +336,44 @@ const setUpdateConn = (html: any, images: any) => {
   imageFiles.value = images;
 };
 
+const exportToExcel = () => {
+  if (rowData.value.length === 0) {
+    alert('다운로드할 데이터가 없습니다.');
+    return;
+  }
+
+  // 엑셀에 표시할 데이터 가공 (헤더 한글화)
+  const excelData = rowData.value.map((item: any) => ({
+    '주문번호': item.orderNo,
+    '픽업상태': item.compYn === 'Y' ? '완료' : '픽업대기',
+    '주문일자': item.conDate,
+    '픽업일자': item.ordDate,
+    '픽업시간': item.ordTime,
+    '주문채널': getLabel(cusChnnel, item.cusChnnel),
+    '결제수단': getLabel(payMd, item.payMd),
+    '결제여부': getLabel(payNt, item.payNt),
+    '금액': item.ordAmt,
+    '예약금': item.ordOtherAmt,
+    '고객명': item.cusNm,
+    '전화번호': item.cusPhone,
+    '등록일자': item.regDate,
+    '등록자': item.regNm,
+    '수정일자': item.updDate,
+    '수정자': item.updNm
+  }));
+
+  // 워크시트 생성
+  const worksheet = XLSX.utils.json_to_sheet(excelData);
+  
+  // 워크북 생성 및 시트 추가
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, '주문내역');
+
+  // 파일 다운로드 (파일명: 주문내역_YYYYMMDD.xlsx)
+  const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  XLSX.writeFile(workbook, `주문내역_${dateStr}.xlsx`);
+};
+
 /**
  * 6. 유틸리티 함수
  */
@@ -370,7 +417,22 @@ const createFormData = (data: any) => {
   const fd = new FormData();
   const processedData = { ...data, conn: replaceImageUrl(data.conn, 'serverUrl') };
   imageFiles.value.forEach((img: any, idx: number) => {
-    fd.append('editorFiles', base64toFile(img, `img${idx}`));
+
+    let extension = '.jpg'; // 기본값 설정
+    
+    if (img && img.includes(';base64')) {
+      const mimeType = img.split(';base64')[0].split(':')[1]; // "image/png" 추출
+      // 💡 2. MimeType에 맞는 확장자 매핑
+      if (mimeType.includes('png')) {
+        extension = '.png';
+      } else if (mimeType.includes('gif')) {
+        extension = '.gif';
+      } else if (mimeType.includes('webp')) {
+        extension = '.webp';
+      } // jpeg, jpg 등은 기본값 '.jpg'를 따름
+    }
+
+    fd.append('editorFiles', base64toFile(img, `img${idx}${extension}`));
   });
   fd.append('saveData', JSON.stringify(processedData));
   return fd;
@@ -406,7 +468,7 @@ onMounted(async () => {
   if (qDate) {
     search.ordDate = qDate; // 검색 필터에 픽업날짜 세팅
   }
-
+  alert(1);
   // 데이터 조회 실행
   await getOrerList();
   
@@ -421,110 +483,145 @@ onMounted(async () => {
 </script>
 
 <template>
-  <!-- 검색 필터 영역 -->
-  <v-form>
-    <v-container :fluid="mobile" :class="mobile ? 'px-0' : ''">
-      <v-row>
-        <v-col cols="12" sm="6" md="4">
-          <v-text-field v-model="search.cusNm" label="고객명" variant="outlined" color="secondary" hide-details class="mb-4" />
+  <v-container fluid class="pa-0">
+    <!-- 검색 필터 영역 -->
+    <v-card class="mb-4 pa-4 rounded-xl bg-white border-thin border-borderLight shadow-none">
+      <v-row dense align="center">
+        <v-col cols="auto" class="d-none d-md-flex align-center pr-4 border-r-thin border-borderLight">
+          <v-icon color="primary" icon="$magnify" class="mr-2" size="20" />
+          <span class="text-subtitle-1 font-weight-black color-darkText">주문 통합 검색</span>
         </v-col>
-        <v-col cols="12" sm="6" md="4">
-          <v-text-field v-model="search.cusPhone" label="고객전화번호" variant="outlined" color="secondary" hide-details class="mb-4" />
+        <v-col cols="12" md="2">
+          <v-text-field 
+            v-model="search.cusNm" 
+            label="고객명" 
+            placeholder="이름 검색"
+            prepend-inner-icon="$accountOutline"
+            hide-details 
+            density="compact"
+          />
         </v-col>
-        <v-col cols="12" sm="6" md="4">
-          <v-text-field v-model="search.ordDate" label="픽업날짜" type="date" variant="outlined" color="secondary" hide-details class="mb-4" />
+        <v-col cols="12" md="2">
+          <v-text-field 
+            v-model="search.cusPhone" 
+            label="전화번호" 
+            placeholder="010-0000-0000"
+            prepend-inner-icon="$phoneOutline"
+            hide-details 
+            density="compact"
+          />
+        </v-col>
+        <v-col cols="12" md="2">
+          <v-text-field 
+            v-model="search.ordDate" 
+            label="픽업날짜" 
+            type="date" 
+            prepend-inner-icon="$calendarClock"
+            hide-details 
+            density="compact"
+          />
+        </v-col>
+        <v-spacer></v-spacer>
+        <v-col cols="auto" class="d-flex ga-2">
+          <v-btn variant="tonal" color="secondary" height="40" @click="resetSeach" :prepend-icon="mdiRefresh">초기화</v-btn>
+          <v-btn color="primary" height="40" @click="getOrerList" :prepend-icon="mdiMagnify" class="px-6">조회</v-btn>
         </v-col>
       </v-row>
-    </v-container>
-  </v-form>
+    </v-card>
 
-  <!-- 검색 버튼 영역 -->
-  <v-row :justify="mobile ? 'center' : 'end'" class="pa-2 px-4 ma-0">
-    <v-col cols="6" sm="auto">
-      <v-btn variant="tonal" color="secondary" block @click="getOrerList">검색</v-btn>
-    </v-col>
-    <v-col cols="6" sm="auto">
-      <v-btn variant="tonal" color="secondary" block @click="resetSeach">초기화</v-btn>
-    </v-col>
-  </v-row>
+    <v-row>
+      <v-col cols="12">
+        <v-card class="rounded-xl bg-white overflow-hidden border-thin border-borderLight shadow-none">
+          <v-card-item class="py-3 px-4 bg-gray100 bg-opacity-30">
+            <div class="d-flex align-center justify-space-between flex-wrap flex-sm-nowrap">
+              <v-card-title class="text-h6 font-weight-black d-flex align-center color-darkText py-1 mr-2">
+                <v-icon color="primary" class="mr-2" :icon="mdiFormatListBulleted" size="20" />
+                <span class="text-truncate">주문 상세 내역</span>
+                <v-chip size="x-small" variant="tonal" color="primary" class="ml-3 font-weight-bold">총 {{ rowData.length }}건</v-chip>
+              </v-card-title>
+              
+              <v-spacer class="d-none d-sm-block"></v-spacer>
 
-  <v-row>
-    <v-col cols="12">
-      <UiParentCard title="주문정보">
-        <!-- 상단 액션 버튼 -->
-        <v-row :justify="mobile ? 'center' : 'end'" class="pa-2 px-4 ma-0">
-          <v-col cols="6" sm="auto">
-            <v-btn variant="outlined" color="primary" block @click="showSave">등록</v-btn>
-          </v-col>
-          <v-col cols="6" sm="auto">
-            <v-btn variant="outlined" color="error" block @click="removeOrder">삭제</v-btn>
-          </v-col>
-        </v-row>
-
-        <!-- [1] 데스크탑 뷰: 데이터 테이블 -->
-        <v-data-table
-          v-if="!mobile"
-          :headers="headers"
-          :items="rowData"
-          v-model="selectedItems"
-          item-value="orderNo"
-          show-select
-          hover
-          height="500px"
-        >
-          <template v-slot:item.orderNo="{ item }">
-            <div class="text-center">
-              <v-btn variant="text" color="primary" @click="handleRowClick(item)" class="px-0">{{ item.orderNo }}</v-btn>
+              <div class="d-flex align-center ga-2 mt-2 mt-sm-0">
+                <v-btn variant="tonal" color="success" height="36" rounded="md" class="px-3" @click="exportToExcel" :prepend-icon="mdiFileExcel">
+                  <span class="d-none d-md-inline">엑셀 다운로드</span>
+                  <span class="d-inline d-md-none">엑셀</span>
+                </v-btn>
+                <v-btn color="primary" height="36" rounded="md" class="px-3" @click="showSave" :prepend-icon="mdiPlus">
+                  <span class="d-none d-md-inline">신규 주문 등록</span>
+                  <span class="d-inline d-md-none">등록</span>
+                </v-btn>
+                <v-btn variant="tonal" color="error" height="36" rounded="md" class="px-3" @click="removeOrder" :prepend-icon="mdiDeleteOutline" v-if="selectedItems.length > 0">
+                  <span class="d-none d-md-inline">삭제 ({{ selectedItems.length }})</span>
+                  <span class="d-inline d-md-none">{{ selectedItems.length }}</span>
+                </v-btn>
+              </div>
             </div>
+          </v-card-item>
+          
+          <v-divider />
+
+          <!-- [1] 데스크탑 뷰: 데이터 테이블 -->
+          <v-data-table
+            v-if="!mobile"
+            :headers="headers"
+            :items="rowData"
+            v-model="selectedItems"
+            item-value="orderNo"
+            show-select
+            hover
+            height="calc(100vh - 430px)"
+            class="custom-table"
+          >
+          <template v-slot:item.orderNo="{ item }">
+            <v-btn variant="text" color="primary" @click="handleRowClick(item)" class="px-2 font-weight-black">#{{ item.orderNo }}</v-btn>
           </template>
           <template v-slot:item.cusChnnel="{ item }">
-            {{ getLabel(cusChnnel, item.cusChnnel) }}
+            <v-chip size="x-small" variant="outlined" color="secondary" class="font-weight-bold">{{ getLabel(cusChnnel, item.cusChnnel) }}</v-chip>
           </template>
           <template v-slot:item.payNt="{ item }">
-            {{ getLabel(payNt, item.payNt) }}
+            <v-chip size="x-small" :color="item.payNt === 'N1' ? 'success' : 'warning'" variant="tonal" class="font-weight-bold">{{ getLabel(payNt, item.payNt) }}</v-chip>
           </template>
           <template v-slot:item.payMd="{ item }">
-            {{ getLabel(payMd, item.payMd) }}
+            <span class="text-body-2 font-weight-medium color-darkText">{{ getLabel(payMd, item.payMd) }}</span>
           </template>
           <template v-slot:item.compYn="{ item }">
-            <div class="text-center">
-              <v-chip v-if="item.compYn == 'Y'" color="success" size="small">완료</v-chip>
-              <v-btn v-else variant="outlined" color="secondary" size="small" @click="handleCompEvent(item)">픽업완료</v-btn>
-            </div>
+            <v-chip v-if="item.compYn == 'Y'" color="success" size="x-small" variant="flat" class="font-weight-bold">완료</v-chip>
+            <v-btn v-else variant="tonal" color="primary" size="x-small" class="font-weight-bold" @click="handleCompEvent(item)">픽업완료</v-btn>
           </template>
           <template v-slot:item.conn="{ item }">
-            <div class="text-center">
-              <v-btn variant="outlined" color="info" size="small" @click="handleClickEvent(item)">상세</v-btn>
-            </div>
+            <v-btn variant="text" color="info" size="x-small" class="font-weight-bold" @click="handleClickEvent(item)">
+              <v-icon start icon="mdi-text-box-search-outline" size="14" /> 상세
+            </v-btn>
           </template>
           <template v-slot:item.ordAmt="{ item }">
-            {{ formatCurrency(item.ordAmt) }}
+            <span class="font-weight-black color-darkText">₩{{ formatCurrency(item.ordAmt) }}</span>
           </template>
           <template v-slot:item.ordOtherAmt="{ item }">
-            {{ formatCurrency(item.ordOtherAmt) }}
+            <span class="text-caption color-lightText">₩{{ formatCurrency(item.ordOtherAmt) }}</span>
           </template>          
         </v-data-table>
 
-        <!-- [2] 모바일 뷰: 프리미엄 카드 리스트 (무한 스크롤) -->
+        <!-- [2] 모바일 뷰: 프리미엄 미니멀 카드 리스트 (무한 스크롤) -->
         <div v-else class="pa-4 pt-0">
-          <v-divider class="mb-4" />
-          <div class="d-flex align-center justify-space-between mb-3 px-1">
+          <div class="d-flex align-center justify-space-between mb-4 mt-2 px-1">
             <v-checkbox
               v-if="rowData.length > 0"
               label="전체 선택"
               density="compact"
               hide-details
-              color="secondary"
+              color="primary"
               @update:model-value="(val) => (selectedItems = val ? rowData.map((r: any) => r.orderNo) : [])"
+              class="font-weight-black text-caption"
             />
-            <span class="text-caption text-grey">전체 {{ rowData.length }}건</span>
+            <v-chip size="x-small" variant="tonal" color="secondary" class="font-weight-bold">총 {{ rowData.length }}건</v-chip>
           </div>
 
-          <v-infinite-scroll :items="mobileDisplayData" @load="loadMore">
+          <v-infinite-scroll :items="mobileDisplayData" @load="loadMore" class="bg-transparent">
             <template v-for="item in mobileDisplayData" :key="item.orderNo">
-              <v-card variant="flat" class="mb-6 overflow-hidden card-mobile">
-                <!-- 카드 헤더 -->
-                <div class="px-4 py-2 bg-grey-lighten-4 d-flex justify-space-between align-center">
+              <v-card variant="flat" class="mb-4 overflow-hidden border-thin border-borderLight rounded-xl bg-white">
+                <!-- 카드 상단: 주문번호 및 상태 -->
+                <div class="px-4 py-2 border-b-thin border-borderLight d-flex justify-space-between align-center bg-gray100 bg-opacity-30">
                   <div class="d-flex align-center">
                     <v-checkbox
                       :model-value="selectedItems.includes(item.orderNo)"
@@ -534,79 +631,101 @@ onMounted(async () => {
                       }"
                       density="compact"
                       hide-details
-                      color="secondary"
-                      class="mr-1"
+                      color="primary"
+                      class="mr-2"
                     />
-                    <span class="text-caption font-weight-black text-grey-darken-1">ORD-{{ item.orderNo }}</span>
+                    <span class="text-caption font-weight-black color-primary">#{{ item.orderNo }}</span>
                   </div>
-                  <v-chip :color="item.compYn === 'Y' ? 'success' : 'orange-darken-1'" size="x-small" variant="flat" class="font-weight-bold px-3">
+                  <v-chip 
+                    :color="item.compYn === 'Y' ? 'success' : 'primary'" 
+                    size="x-small" 
+                    variant="flat" 
+                    class="font-weight-bold px-3"
+                  >
                     {{ item.compYn === 'Y' ? '완료' : '픽업대기' }}
                   </v-chip>
                 </div>
 
-                <!-- 카드 본문 -->
-                <v-card-text class="pa-5">
-                  <div class="mb-4">
-                    <div class="text-subtitle-1 font-weight-bold text-primary mb-1">{{ item.prodNm }}</div>
-                    <div class="text-h6 font-weight-bold text-grey-darken-4 d-flex align-center line-height-1-2">
-                      <v-icon size="22" color="grey-darken-3" class="mr-1" icon="$accountCircle" />
+                <!-- 카드 본문: 핵심 정보 -->
+                <v-card-text class="pa-4">
+                  <div class="mb-3">
+                    <div class="text-subtitle-2 color-lightText mb-1">{{ item.prodNm }}</div>
+                    <div class="text-h6 font-weight-black color-darkText d-flex align-center">
+                      <v-icon size="18" color="primary" class="mr-1" :icon="mdiAccountCircle" />
                       {{ item.cusNm }}
                     </div>
                   </div>
-                  <v-divider class="mb-4 border-light" />
-                  <v-row no-gutters>
-                    <v-col cols="12" class="mb-2 d-flex align-center">
-                      <v-icon size="16" color="grey-lighten-1" class="mr-2" icon="$calendarClock" />
-                      <span class="text-body-2 text-grey-darken-2 font-weight-medium">{{ item.ordDate }}</span>
-                      <span class="text-caption text-grey-lighten-1 ml-2">{{ item.ordTime }}</span>
-                    </v-col>
-                    <v-col cols="12" class="d-flex align-center">
-                      <v-icon size="16" color="grey-lighten-1" class="mr-2" icon="$phoneOutline" />
-                      <span class="text-body-2 text-grey-darken-2 font-weight-medium">{{ item.cusPhone }}</span>
-                      <v-chip
-                        v-if="item.cusChnnel"
-                        size="x-small"
-                        :color="getChannelColor(item.cusChnnel).text"
-                        :bg-color="getChannelColor(item.cusChnnel).bg"
-                        variant="flat"
-                        class="ml-2 px-2 font-weight-bold"
-                        style="font-size: 10px"
-                      >
+                  
+                  <div class="d-flex flex-column ga-1">
+                    <div class="d-flex align-center text-caption color-lightText">
+                      <v-icon size="14" class="mr-2" :icon="mdiCalendarClock" />
+                      <span class="font-weight-medium">{{ item.ordDate }}</span>
+                      <span class="ml-2">{{ item.ordTime }}</span>
+                    </div>
+                    <div class="d-flex align-center text-caption color-lightText">
+                      <v-icon size="14" class="mr-2" :icon="mdiPhoneOutline" />
+                      <span class="font-weight-medium">{{ item.cusPhone }}</span>
+                      <v-chip v-if="item.cusChnnel" size="x-small" variant="outlined" color="secondary" class="ml-2 px-1 font-weight-bold" style="height: 16px; font-size: 9px">
                         {{ getLabel(cusChnnel, item.cusChnnel) }}
                       </v-chip>
-                    </v-col>
-                  </v-row>
+                    </div>
+                  </div>
+
+                  <div class="mt-4 pt-3 border-t-thin border-borderLight d-flex justify-space-between align-center">
+                    <v-chip size="x-small" variant="tonal" :color="item.payNt === 'N1' ? 'success' : 'warning'" class="font-weight-bold">
+                      {{ getLabel(payNt, item.payNt) }}
+                    </v-chip>
+                    <div class="text-right">
+                      <span class="text-caption color-lightText mr-1">결제금액</span>
+                      <span class="text-h6 font-weight-black color-primary">₩{{ formatCurrency(item.ordAmt) }}</span>
+                    </div>
+                  </div>
                 </v-card-text>
 
-                <!-- 카드 하단 버튼 -->
-                <v-divider />
-                <div class="pa-3 bg-white d-flex align-center">
-                  <v-btn variant="text" color="grey-darken-1" class="font-weight-bold" prepend-icon="$magnify" @click="handleClickEvent(item)">상세</v-btn>
-                  <v-btn variant="text" color="info" class="font-weight-bold mx-1" prepend-icon="$pencilOutline" @click="handleRowClick(item)">수정</v-btn>
-                  <v-spacer />
+                <!-- 카드 하단: 액션 버튼 -->
+                <v-divider class="border-borderLight" />
+                <div class="d-flex bg-white">
+                  <v-btn variant="text" color="secondary" height="44" class="flex-grow-1 rounded-0 text-caption font-weight-bold" @click="handleClickEvent(item)">
+                    <v-icon start :icon="mdiMagnify" size="16" /> 상세
+                  </v-btn>
+                  <v-btn variant="text" color="secondary" height="44" class="flex-grow-1 rounded-0 text-caption font-weight-bold border-x-thin border-borderLight" @click="handleRowClick(item)">
+                    <v-icon start :icon="mdiPencilOutline" size="16" /> 수정
+                  </v-btn>
                   <v-btn
-                    :variant="item.compYn === 'Y' ? 'tonal' : 'elevated'"
-                    :color="item.compYn === 'Y' ? 'grey-lighten-4' : 'success'"
-                    :disabled="item.compYn === 'Y'"
-                    rounded="pill"
-                    size="small"
-                    class="px-5 font-weight-black"
-                    elevation="2"
+                    v-if="item.compYn !== 'Y'"
+                    variant="text"
+                    color="primary"
+                    height="44"
+                    class="flex-grow-1 rounded-0 text-caption font-weight-bold"
                     @click="handleCompEvent(item)"
                   >
-                    {{ item.compYn === 'Y' ? '완료됨' : '픽업완료' }}
+                    픽업완료
+                  </v-btn>
+                  <v-btn
+                    v-else
+                    variant="text"
+                    color="success"
+                    height="44"
+                    class="flex-grow-1 rounded-0 text-caption font-weight-bold"
+                    disabled
+                  >
+                    완료됨
                   </v-btn>
                 </div>
               </v-card>
             </template>
             <template v-slot:empty>
-              <div class="text-center text-caption text-grey pa-4">모든 데이터를 확인했습니다.</div>
+              <div class="text-center pa-10">
+                <v-icon :icon="mdiFormatListBulleted" color="secondary" class="mb-2 opacity-30" size="32" />
+                <div class="text-caption color-lightText font-weight-medium">모든 내역을 불러왔습니다.</div>
+              </div>
             </template>
           </v-infinite-scroll>
         </div>
-      </UiParentCard>
+      </v-card>
     </v-col>
   </v-row>
+</v-container>
 
   <!-- [3] 팝업 레이어 영역 -->
   <Dialogs v-model="isActive" :conn-value="connValue" :img-files="searchImageFiles" />

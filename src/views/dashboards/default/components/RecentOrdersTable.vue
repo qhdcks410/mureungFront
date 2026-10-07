@@ -132,9 +132,9 @@ onMounted(() => loadRecentOrders());
         </div>
 
         <div v-else>
-          <div v-for="(item, i) in displayOrders" :key="i" class="mb-4">
+            <div v-for="(item, i) in displayOrders" :key="i" class="mb-4">
             <v-card 
-              :class="['order-card rounded-xl border-all shadow-sm', item.compYn === 'Y' ? 'completed-card bg-grey-lighten-5' : 'bg-white']"
+              :class="['order-card rounded-lg', item.compYn === 'Y' ? 'completed-card' : '']"
               @click="goToDetail(item)"
             >
               <div :class="['card-side-bar', item.compYn === 'Y' ? 'bg-grey-lighten-1' : 'bg-primary']" />
@@ -142,63 +142,62 @@ onMounted(() => loadRecentOrders());
               <v-card-text class="pa-4">
                 <!-- 상단: 시간 및 기본정보 -->
                 <div class="d-flex align-center mb-3">
-                  <div :class="item.compYn === 'Y' ? 'bg-grey-lighten-3 text-grey' : 'bg-primary-lighten-5 text-primary'" class="px-3 py-1 rounded-lg font-weight-black text-h6 mr-3">
+                  <div :class="item.compYn === 'Y' ? 'bg-grey-lighten-3 text-grey' : 'bg-primary-lighten-5 text-primary'" class="px-3 py-1 rounded-md font-weight-black text-h6 mr-3">
                     {{ item.ordTime || '시간미정' }}
                   </div>
                   <div class="flex-grow-1 overflow-hidden">
-                    <h4 :class="['text-h6 font-weight-black text-truncate', item.compYn === 'Y' ? 'text-grey text-decoration-line-through' : 'text-grey-darken-4']">
+                    <h4 :class="['text-h6 font-weight-bold text-truncate', item.compYn === 'Y' ? 'text-grey text-decoration-line-through' : 'text-grey-darken-4']">
                       {{ item.prodNm || '상품명 없음' }}
                     </h4>
                   </div>
-                  <v-chip v-if="item.compYn === 'Y'" color="success" size="small" variant="tonal" class="font-weight-black">완료</v-chip>
-                  <v-chip v-else color="primary" size="small" variant="outlined" class="font-weight-black">대기</v-chip>
+                  <v-chip v-if="item.compYn === 'Y'" color="success" size="small" variant="tonal" class="font-weight-black rounded-md">완료</v-chip>
+                  <v-chip v-else color="primary" size="small" variant="flat" class="font-weight-black rounded-md">대기</v-chip>
                 </div>
 
-                <v-divider class="mb-3 opacity-50" />
+                <v-divider class="mb-4 opacity-50" />
 
-                <!-- 하단: 금액 상세 및 액션 -->
-                <div class="d-flex justify-space-between align-end">
-                  <div class="d-flex flex-column gap-1">
-                    <div class="d-flex align-center text-caption text-grey-darken-1 mb-1">
+                <!-- 하단: 상세 정보 및 액션 -->
+                <div class="d-flex justify-space-between align-center">
+                  <div class="d-flex flex-column gap-2 flex-grow-1 mr-4">
+                    <div class="d-flex align-center text-caption text-grey-darken-1">
                       <span class="font-weight-bold text-grey-darken-3 mr-2">{{ item.cusNm || '익명' }}</span>
-                      <PhoneIcon size="12" class="mr-1" /> {{ item.cusPhone || '-' }}
+                      <PhoneIcon size="14" class="mr-1 text-grey" /> {{ item.cusPhone || '-' }}
                     </div>
                     
                     <!-- 금액 상세 레이아웃 -->
-                    <div class="d-flex align-center bg-grey-lighten-5 rounded-lg px-3 py-2 border-all">
-                      <div class="text-center px-2">
-                        <div class="text-overline text-grey" style="font-size: 8px !important; line-height: 1;">총금액</div>
-                        <div class="text-caption font-weight-bold text-grey-darken-2">₩{{ Number(item.ordAmt || 0).toLocaleString() }}</div>
+                    <div class="d-flex align-center bg-light-background rounded-md px-2 py-2 border-thin gap-1">
+                      <div class="price-box flex-1 text-center">
+                        <span class="price-label">총금액</span>
+                        <span class="price-value text-grey-darken-1">₩{{ Number(item.ordAmt || 0).toLocaleString() }}</span>
                       </div>
-                      <span class="text-grey-lighten-2 mx-1">-</span>
-                      <div class="text-center px-2">
-                        <div class="text-overline text-grey" style="font-size: 8px !important; line-height: 1;">예치금</div>
-                        <div class="text-caption font-weight-bold text-primary">₩{{ Number(item.ordOtherAmt || 0).toLocaleString() }}</div>
+                      <div class="price-divider">-</div>
+                      <div class="price-box flex-1 text-center">
+                        <span class="price-label">예치금</span>
+                        <span class="price-value text-primary">₩{{ Number(item.ordOtherAmt || 0).toLocaleString() }}</span>
                       </div>
-                      <span class="text-grey-lighten-2 mx-1">=</span>
-                      <div class="text-center px-2 bg-white rounded border-all shadow-sm">
-                        <div class="text-overline text-error font-weight-black" style="font-size: 8px !important; line-height: 1;">결제잔금</div>
-                        <div class="text-subtitle-1 font-weight-black text-error">₩{{ (Number(item.ordAmt || 0) - Number(item.ordOtherAmt || 0)).toLocaleString() }}</div>
+                      <div class="price-divider">=</div>
+                      <div class="price-box flex-1 text-center highlight bg-white rounded-md shadow-modern">
+                        <span class="price-label text-error">잔금</span>
+                        <span class="price-value text-error font-weight-black">₩{{ (Number(item.ordAmt || 0) - Number(item.ordOtherAmt || 0)).toLocaleString() }}</span>
                       </div>
                     </div>
                   </div>
 
-                  <div class="ml-2">
+                  <div class="flex-none">
                     <v-btn
                       v-if="item.compYn !== 'Y'"
                       color="success"
                       variant="elevated"
-                      rounded="pill"
-                      class="pickup-btn px-5 font-weight-black"
-                      height="44"
-                      elevation="4"
+                      rounded="lg"
+                      class="pickup-btn px-4 font-weight-bold"
+                      height="40"
                       @click.stop="completePickup(item)"
                     >
-                      <template v-slot:prepend><CheckIcon size="20" stroke-width="3" /></template>
-                      픽업완료처리
+                      <template v-slot:prepend><CheckIcon size="18" stroke-width="3" /></template>
+                      픽업완료
                     </v-btn>
-                    <v-avatar v-else color="success-lighten-5" size="44">
-                      <v-icon color="success" size="32">mdi-check-decagram</v-icon>
+                    <v-avatar v-else color="success-lighten-5" size="40" class="rounded-lg">
+                      <v-icon color="success" size="28">mdi-check-decagram</v-icon>
                     </v-avatar>
                   </div>
                 </div>
@@ -223,8 +222,43 @@ onMounted(() => loadRecentOrders());
 </template>
 
 <style scoped>
-/* 추가적인 미세 조정 스타일 */
-.gap-1 { gap: 4px; }
-.border-all { border: 1px solid #f0f0f0 !important; }
-.shadow-glow { box-shadow: 2px 0 10px rgba(var(--v-theme-primary), 0.2); }
+.flex-1 { flex: 1; }
+.bg-light-background { background-color: #f8fafc; }
+
+.price-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2px 4px;
+}
+
+.price-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #94a3b8;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.price-value {
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.price-divider {
+  color: #cbd5e1;
+  font-weight: 300;
+  font-size: 0.75rem;
+}
+
+.highlight {
+  padding: 4px 8px;
+  border: 1px solid rgba(var(--v-theme-error), 0.1);
+}
+
+.pickup-btn {
+  letter-spacing: -0.02em;
+}
 </style>

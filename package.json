@@ -5,6 +5,7 @@
   "author": "CodedThemes",
   "type": "module",
   "scripts": {
+    "local": "vite --mode local",
     "dev": "vite --mode dev",
     "build": "vue-tsc --noEmit && vite build --mode prod",
     "build-stage": "vue-tsc --noEmit && vite build --base=/vue/free/stage/",
@@ -56,6 +57,7 @@
     "vue3-quill": "^0.3.1",
     "vuetify": "3.7.6",
     "webpack-plugin-vuetify": "3.0.3",
+    "xlsx": "^0.18.5",
     "yup": "1.6.1"
   },
   "devDependencies": {

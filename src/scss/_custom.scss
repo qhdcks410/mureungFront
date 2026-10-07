@@ -20,24 +20,38 @@
 .flex-grow-1 { flex-grow: 1 !important; min-height: 0; }
 .h-100 { height: 100% !important; }
 
-// [2] Dashboard Components (RecentOrdersTable)
+// Gap Utilities
+@for $i from 1 through 8 {
+  .gap-#{$i} { gap: #{$i * 4}px !important; }
+}
+
+// Border Utilities
+.border-thin { border: 1px solid $border-color !important; }
+.border-subtle { border: 1px solid rgba(var(--v-theme-primary), 0.05) !important; }
+
+// [2] Dashboard Components
 .order-card {
-  border: 1px solid #f8f8f8 !important;
+  border: 1px solid $border-color !important;
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: $box-shadow;
 
   &:hover {
-    border-color: rgba(var(--v-theme-primary), 0.2) !important;
-    background: #fafafa;
-    transform: translateY(-2px);
+    border-color: rgba(var(--v-theme-primary), 0.15) !important;
+    background: white;
+    transform: translateY(-4px);
+    box-shadow: $box-shadow-hover;
   }
 
   &.completed-card {
-    border-color: #eee !important;
-    opacity: 0.7;
+    border-color: $border-color !important;
+    background-color: #f9fafb !important;
+    opacity: 0.8;
     cursor: default;
+    box-shadow: none;
+    &:hover { transform: none; }
   }
 }
 
@@ -48,19 +62,20 @@
   bottom: 0;
   width: 4px;
   z-index: 2;
+  border-radius: 4px 0 0 4px;
 }
 
 // [3] Scrollbar & Containers
 .scroll-container {
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
+  scrollbar-width: thin;
+  scrollbar-color: $border-color-dark transparent;
+
+  &::-webkit-scrollbar { width: 5px; }
+  &::-webkit-scrollbar-track { background: transparent; }
   &::-webkit-scrollbar-thumb {
-    background: #eee;
+    background: $border-color-dark;
     border-radius: 10px;
-    &:hover {
-      background: #ccc;
-    }
+    &:hover { background: darken($border-color-dark, 10%); }
   }
 
   @media (max-width: 960px) {
@@ -70,32 +85,52 @@
   }
 }
 
-// [4] Header & Navigation
-.search-sheet {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 10;
-  height: 80px;
-  display: flex;
-  align-items: center;
+// [4] Specialized UI Elements
+.bubble-shape {
+  position: relative;
+  overflow: hidden;
+  &::after {
+    content: "";
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 50%;
+    top: -65px;
+    right: -35px;
+  }
+  &::before {
+    content: "";
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+    bottom: -30px;
+    right: 20px;
+  }
 }
 
-.shadow-primary {
-  box-shadow: 0 4px 15px rgba(var(--v-theme-primary), 0.3) !important;
-}
-
-// [5] Buttons & UI Elements
 .pickup-btn {
   transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  &:hover { transform: scale(1.05); }
-  &:active { transform: scale(0.95); }
+  box-shadow: $box-shadow-primary;
+  &:hover { 
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: $box-shadow-primary;
+  }
+  &:active { transform: scale(0.98); }
 }
 
-.gap-2 { gap: 8px !important; }
-.gap-4 { gap: 16px !important; }
+.shadow-modern { box-shadow: $box-shadow !important; }
+.shadow-hover { 
+  transition: box-shadow 0.3s ease;
+  &:hover { box-shadow: $box-shadow-hover !important; }
+}
 
 // Vuetify Overrides
 .v-field__outline {
-  --v-field-border-opacity: 0.1 !important;
+  --v-field-border-opacity: 0.08 !important;
+}
+.v-card.with-border {
+  border: 1px solid $border-color !important;
 }
