@@ -1,4 +1,5 @@
 import { useAuthStore } from '@/stores/auth';
+import { useLoginStore } from '@/stores/login';
 
 export const fetchWrapper = {
   get: request('GET'),
@@ -36,11 +37,17 @@ function request(method: string) {
 
 function authHeader(url: string): Record<string, string> {
   // return auth header with jwt if user is logged in and request is to the api url
-  const { user } = useAuthStore();
-  const isLoggedIn = !!user?.token;
+  const loginStore = useLoginStore(); 
+  
+  // 3. loginStore에 저장된 accessToken이 있는지 확인합니다.
+  // (loginStore 내부의 토큰 상태 속성명에 맞게 필요시 수정하세요. 예: loginStore.accessToken)
+  const isLoggedIn = !!loginStore.accessToken; 
+  
   const isApiUrl = url.startsWith(import.meta.env.VITE_API_URL);
+
   if (isLoggedIn && isApiUrl) {
-    return { Authorization: `Bearer ${user.token}` };
+    // 4. Bearer 토큰 주입
+    return { Authorization: `Bearer ${loginStore.accessToken}` };
   } else {
     return {};
   }
@@ -51,10 +58,15 @@ function handleResponse(response: Response): Promise<UserData> {
     const data = text && JSON.parse(text);
 
     if (!response.ok) {
-      const { user, logout } = useAuthStore();
-      if ([401, 403].includes(response.status) && user) {
-        // auto logout if 401 Unauthorized or 403 Forbidden response returned from api
-        logout();
+      const authStore = useAuthStore();
+      const loginStore = useLoginStore();
+
+      // 💡 이전의 user 대신 loginStore에 accessToken(또는 유저 정보)이 있는지 확인합니다.
+      const isLoggedIn = !!loginStore.accessToken; 
+
+      if ([401, 403].includes(response.status) && isLoggedIn) {
+        // 401, 403 에러 발생 시 useAuthStore의 logout 액션을 실행합니다.
+        authStore.logout();
       }
 
       const error: string = (data && data.message) || response.statusText;

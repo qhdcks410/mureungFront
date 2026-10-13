@@ -2,7 +2,6 @@
 import { ref, computed, onMounted } from 'vue';
 import UiParentCard from '@/components/shared/UiParentCard.vue';
 import request from '@/api/request';
-import type { AxiosResponse } from 'axios';
 
 // 1. 카테고리 데이터를 먼저 선언
 const categories123 = ref(['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']);

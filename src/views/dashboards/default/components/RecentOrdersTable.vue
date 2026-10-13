@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import request from '@/api/request';
-import { ChevronRightIcon, CheckIcon, PhoneIcon, ClockIcon, CashIcon, Receipt2Icon } from 'vue-tabler-icons';
+import { ChevronRightIcon, CheckIcon, PhoneIcon, ClockIcon, Receipt2Icon } from 'vue-tabler-icons';
 
 /**
  * 1. 상태 관리 (State)

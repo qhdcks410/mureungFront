@@ -2,20 +2,19 @@
 import { ref } from 'vue';
 import { useCustomizerStore } from '../../../stores/customizer';
 import { useAuthStore } from '@/stores/auth';
-import { SettingsIcon, SearchIcon, Menu2Icon, LogoutIcon, PlusIcon } from 'vue-tabler-icons';
+import { Menu2Icon, LogoutIcon, PlusIcon } from 'vue-tabler-icons';
 
-import ProfileDD from './ProfileDD.vue';
 import Searchbar from './SearchBarPanel.vue';
 import QuickOrderDialog from '@/components/popup/QuickOrderDialog.vue';
 
 const customizer = useCustomizerStore();
 const authStore = useAuthStore();
-const showSearch = ref(false);
+// const showSearch = ref(false);
 const isOrderDialogOpen = ref(false);
 
-function searchbox() {
-  showSearch.value = !showSearch.value;
-}
+// function searchbox() {
+//   showSearch.value = !showSearch.value;
+// }
 
 const handleOrderSuccess = () => {
   if (window.location.pathname.includes('dashboard') || window.location.pathname === '/') {

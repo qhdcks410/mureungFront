@@ -16,7 +16,6 @@ import {
 } from '@mdi/js';
 
 // 컴포넌트 임포트
-import UiParentCard from '@/components/shared/UiParentCard.vue';
 import Dialogs from '@/components/apps/Dialogs.vue';
 import QuillEditor from '@/components/apps/QuillEditor.vue';
 import CustomerPopup from '@/components/popup/CustomerPopup.vue';
@@ -27,8 +26,8 @@ import QuickOrderDialog from '@/components/popup/QuickOrderDialog.vue';
  */
 const { mobile } = useDisplay();
 const route = useRoute();
-const rowData = ref([]);
-const selectedItems = ref([]);
+const rowData = ref<any[]>([]);
+const selectedItems = ref<any[]>([]);
 const displayCount = ref(10); // 모바일 무한 스크롤 초기 개수
 
 // 다이얼로그 제어
@@ -50,7 +49,7 @@ const minOptions = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2,
 
 // 상세/편집 데이터
 const connValue = ref('');
-const searchImageFiles = ref([]);
+const searchImageFiles = ref<any[]>([]);
 const imageFiles = ref([]);
 
 // 예약금 콤마용 상태
@@ -68,15 +67,6 @@ const formattedOtherAmt = computed({
   set: (val) => {
     const num = val.replace(/[^\d]/g, '');
     saveItem.ordOtherAmt = num;
-  }
-});
-
-// 전화번호 하이픈용 상태
-const formattedPhone = computed({
-  get: () => formatPhone(saveItem.cusPhone),
-  set: (val) => {
-    const num = val.replace(/[^\d]/g, '');
-    saveItem.cusPhone = num;
   }
 });
 
@@ -139,7 +129,7 @@ const payNt = [
   { lable: '예약금', value: 'N2' }
 ];
 
-const allHeaders = ref([
+const allHeaders = ref<any[]>([
   { align: 'center', key: 'orderNo', sortable: false, title: '주문번호', minWidth: '100px' },
   { align: 'center', key: 'compYn', title: '픽업상태', minWidth: '100px' },
   { align: 'center', key: 'conDate', title: '주문일자', minWidth: '120px' },
@@ -183,43 +173,6 @@ const getOrerList = () => {
       ...item,
       orderNo: Number(item.orderNo)
     }));
-  });
-};
-
-const saveOrder = () => {
-  // 필수 입력값 체크 (상담내용 conn 제외)
-  const requiredFields = [
-    { key: 'cusChnnel', label: '상담채널' },
-    { key: 'payMd', label: '결제수단' },
-    { key: 'payNt', label: '결제방법' },
-    { key: 'ordAmt', label: '금액' },
-    { key: 'cusNm', label: '고객이름' },
-    { key: 'cusPhone', label: '전화번호' },
-    { key: 'ordDate', label: '픽업날짜' },
-    { key: 'prodNm', label: '상품명' }
-  ];
-
-  for (const field of requiredFields) {
-    if (!saveItem[field.key as keyof typeof saveItem]) {
-      alert(`${field.label}을(를) 입력해주세요.`);
-      return;
-    }
-  }
-
-  if (!validatePhone(saveItem.cusPhone)) {
-    alert('올바른 전화번호 형식이 아닙니다. (예: 010-1234-5678)');
-    return;
-  }
-  // 시간/분 합치기
-  saveItem.ordTime = `${hourPart.value}:${minPart.value}`;
-  
-  const formData = createFormData(saveItem);
-  request.post('/api/customer/insertCustomer', formData).then((res) => {
-    if (res.status === 200) {
-      alert('등록되었습니다.');
-      getOrerList();
-      isRegiter.value = false;
-    }
   });
 };
 
@@ -385,15 +338,6 @@ const validatePhone = (phone: string) => {
   return regex.test(phone);
 };
 
-const getChannelColor = (code: string) => {
-  const colors: Record<string, any> = {
-    C1: { bg: '#FFEB3B', text: '#3E2723' }, // 카카오
-    C2: { bg: '#E8F5E9', text: '#2E7D32' }, // 네이버
-    C3: { bg: '#E8F5E9', text: '#2E7D32' }  // 네이버
-  };
-  return colors[code] || { bg: '#F5F5F5', text: '#616161' };
-};
-
 const formatCurrency = (val: any) => (val ? new Intl.NumberFormat('ko-KR').format(val) : '');
 
 const formatPhone = (val: string) => {
@@ -415,8 +359,20 @@ const formatPhone = (val: string) => {
 
 const createFormData = (data: any) => {
   const fd = new FormData();
+  const existingFileIds: string[] = [];
+
   const processedData = { ...data, conn: replaceImageUrl(data.conn, 'serverUrl') };
+
   imageFiles.value.forEach((img: any, idx: number) => {
+
+
+    // 1. 기존 http 주소라면 URL에서 파일명만 추출해서 보관 (다운로드 하지 않음!)
+    if (typeof img === 'string' && img.startsWith('http')) {
+      const fileId = img.substring(img.lastIndexOf('/') + 1);
+      existingFileIds.push(fileId);
+      return; 
+    }
+
 
     let extension = '.jpg'; // 기본값 설정
     
@@ -431,9 +387,12 @@ const createFormData = (data: any) => {
         extension = '.webp';
       } // jpeg, jpg 등은 기본값 '.jpg'를 따름
     }
-
     fd.append('editorFiles', base64toFile(img, `img${idx}${extension}`));
   });
+
+  //제외할 파일 넣기
+  processedData.existingFileIds = existingFileIds;
+
   fd.append('saveData', JSON.stringify(processedData));
   return fd;
 };
@@ -442,7 +401,12 @@ const replaceImageUrl = (html: string, url: string) => {
   if (!html || typeof document === 'undefined') return html;
   const div = document.createElement('div');
   div.innerHTML = html;
-  div.querySelectorAll('img').forEach((img) => img.setAttribute('src', url));
+  div.querySelectorAll('img').forEach((img) => {
+   const currentSrc = img.getAttribute('src') || '';
+   if(!currentSrc.includes('http')){
+    img.setAttribute('src', url);
+   }
+  });
   return div.innerHTML;
 };
 
@@ -468,7 +432,6 @@ onMounted(async () => {
   if (qDate) {
     search.ordDate = qDate; // 검색 필터에 픽업날짜 세팅
   }
-  alert(1);
   // 데이터 조회 실행
   await getOrerList();
   
@@ -651,19 +614,19 @@ onMounted(async () => {
                   <div class="mb-3">
                     <div class="text-subtitle-2 color-lightText mb-1">{{ item.prodNm }}</div>
                     <div class="text-h6 font-weight-black color-darkText d-flex align-center">
-                      <v-icon size="18" color="primary" class="mr-1" :icon="mdiAccountCircle" />
+                      <v-icon size="18" color="primary" class="mr-1" icon="mdiAccountCircle" />
                       {{ item.cusNm }}
                     </div>
                   </div>
                   
                   <div class="d-flex flex-column ga-1">
                     <div class="d-flex align-center text-caption color-lightText">
-                      <v-icon size="14" class="mr-2" :icon="mdiCalendarClock" />
+                      <v-icon size="14" class="mr-2" icon="mdiCalendarClock" />
                       <span class="font-weight-medium">{{ item.ordDate }}</span>
                       <span class="ml-2">{{ item.ordTime }}</span>
                     </div>
                     <div class="d-flex align-center text-caption color-lightText">
-                      <v-icon size="14" class="mr-2" :icon="mdiPhoneOutline" />
+                      <v-icon size="14" class="mr-2" icon="mdiPhoneOutline" />
                       <span class="font-weight-medium">{{ item.cusPhone }}</span>
                       <v-chip v-if="item.cusChnnel" size="x-small" variant="outlined" color="secondary" class="ml-2 px-1 font-weight-bold" style="height: 16px; font-size: 9px">
                         {{ getLabel(cusChnnel, item.cusChnnel) }}
@@ -689,7 +652,7 @@ onMounted(async () => {
                     <v-icon start :icon="mdiMagnify" size="16" /> 상세
                   </v-btn>
                   <v-btn variant="text" color="secondary" height="44" class="flex-grow-1 rounded-0 text-caption font-weight-bold border-x-thin border-borderLight" @click="handleRowClick(item)">
-                    <v-icon start :icon="mdiPencilOutline" size="16" /> 수정
+                    <v-icon start icon="mdiPencilOutline" size="16" /> 수정
                   </v-btn>
                   <v-btn
                     v-if="item.compYn !== 'Y'"

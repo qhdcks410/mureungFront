@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { shallowRef } from 'vue';
+// import { shallowRef } from 'vue';
 
-const footerLink = shallowRef([
-  {
-    title: '스마트플레이스',
-    url: 'https://new.smartplace.naver.com/'
-  },
-  {
-    title: '스마트스토어',
-    url: 'https://smartstore.naver.com/youngstay'
-  },
-  {
-    title: '블로그',
-    url: 'https://blog.naver.com/mureung_dessert'
-  }
-]);
+// const footerLink = shallowRef([
+//   {
+//     title: '스마트플레이스',
+//     url: 'https://new.smartplace.naver.com/'
+//   },
+//   {
+//     title: '스마트스토어',
+//     url: 'https://smartstore.naver.com/youngstay'
+//   },
+//   {
+//     title: '블로그',
+//     url: 'https://blog.naver.com/mureung_dessert'
+//   }
+// ]);
 </script>
 <template>
   <v-footer class="px-0 py-4 bg-transparent">

@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router';
 import MainRoutes from './MainRoutes';
 import { defineAsyncComponent } from 'vue';
 import Cookies from 'js-cookie';
-import { useLoginStore } from '@/stores/login';
 
 export const router =createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

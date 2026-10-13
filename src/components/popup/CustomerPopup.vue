@@ -11,7 +11,7 @@ const emit = defineEmits(['update:modelValue', 'selected']);
 
 // 상태 관리
 const tab = ref(0); // 0: 검색, 1: 직접입력
-const customerList = ref([]);
+const customerList = ref<any[]>([]);
 const loading = ref(false);
 const customerSearch = ref('');
 
